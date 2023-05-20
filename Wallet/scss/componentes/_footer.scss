@@ -1,104 +1,100 @@
-#contactos{
+#contactos {
     background-color: $color_principal;
     width: 100%;
 
-    padding: $padding_sections 0px $padding_sections/2 0px ;
+    padding: $padding_sections 0px $padding_sections/2 0px;
 
-        @media screen and (min-width:577px) and (max-width:991px){ 
-            @include separador_secciones(0vh,$padding_sections/2);
-        } 
+    @media screen and (min-width:577px) and (max-width:991px) {
+        @include separador_secciones(0vh, $padding_sections/2);
+    }
 
-        @media screen and (min-width:0px)and (max-width:576px){
-         @include separador_secciones(0vh,$padding_sections);
-        }
+    @media screen and (min-width:0px)and (max-width:576px) {
+        @include separador_secciones(0vh, $padding_sections);
+    }
 
-    .leyenda{
-        font-size: nth($size_fuente_px,4);
+    .leyenda {
+        font-size: nth($size_fuente_px, 4);
         text-align: center;
         color: white;
         margin-top: 10vh;
         padding: 0px 10vw;
 
-        @media screen and (max-width:768px){
-            font-size: nth($size_fuente_px,5);
+        @media screen and (max-width:768px) {
+            font-size: nth($size_fuente_px, 5);
             margin-top: 7vh;
-            
-        }   
+
+        }
     }
 
-    .certificaciones{
+    .certificaciones {
 
         display: flex;
         justify-content: center;
         margin-top: 5vh;
     }
-    
-    .contactos-container{
+
+    .contactos-container {
         display: flex;
 
-        .titulos{
+        .titulos {
             color: white;
             font-weight: 600;
-            font-size: nth($size_fuente,5);
+            font-size: nth($size_fuente, 5);
         }
-    
-        .redessociales-container{
+
+        .redessociales-container {
             text-align: center;
-            
-          
+
+
             .fa {
                 display: inline-block;
                 margin: 10px 20px;
                 padding: 10px 20px;
-                font-size: nth($size_fuente,4);
+                font-size: nth($size_fuente, 4);
                 text-decoration: none;
-     
-                    @media screen and (max-width:767px){
-                        font-size: nth($size_fuente,5);
-                        margin: 5px 10px;
-                    }
 
-                &:hover{
+                @media screen and (max-width:767px) {
+                    font-size: nth($size_fuente, 5);
+                    margin: 5px 10px;
+                }
+
+                &:hover {
                     background-color: #a89ebb;
                     color: white;
                     border-radius: 20px;
-                    -webkit-transition:all 1.5s;
-                    -o-transition:all 1.5s ;
-                    -moz-transition:all 1.5s;
-                    transition:all 1.5s;
+                    -webkit-transition: all 1.5s;
+                    -o-transition: all 1.5s;
+                    -moz-transition: all 1.5s;
+                    transition: all 1.5s;
                 }
             }
-            a{
+
+            a {
                 color: white;
             }
         }
 
-        .contactos-container{
+        .contactos-container {
             display: block;
             text-align: center;
-                
-                @media screen and (max-width:767px){
-                    font-size: nth($size_fuente_px,3);
-                    padding-top: 30px !important;
-                }
-              
-            address{
-                p{   
+
+            @media screen and (max-width:767px) {
+                font-size: nth($size_fuente_px, 3);
+                padding-top: 30px !important;
+            }
+
+            address {
+                p {
                     color: white;
-                    font-size: nth($size_fuente,5);
+                    font-size: nth($size_fuente, 5);
                     padding-top: 2vh;
 
-                    @media screen and (max-width:767px){
-                       font-size: nth($size_fuente_px,2);
+                    @media screen and (max-width:767px) {
+                        font-size: nth($size_fuente_px, 2);
 
                     }
                 }
             }
-
-        
         }
-
     }
-
-
 }

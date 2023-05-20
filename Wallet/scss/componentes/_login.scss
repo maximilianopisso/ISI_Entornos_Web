@@ -1,9 +1,5 @@
-
-
-
 #login{
 
- 
     @include separador_secciones(0px,$padding_sections);
     padding-bottom:$padding_sections/2 ;
    
@@ -14,7 +10,6 @@
         @media screen and (min-width:0px)and (max-width:576px){
             @include separador_secciones($margin_sections/5,$padding_sections);
         }
-
 
     display: flex;
     flex-direction: column;
@@ -28,8 +23,7 @@
        }
 
 
-    h1{
-          
+    h1{       
         font-size: nth($size_fuente,4);
         font-weight: 700;
         color: darken($color_principal,20%);
@@ -43,7 +37,6 @@
 
 
     .conteiner-login{
-
         display: flex;
         align-items: center;
         justify-content: center;
@@ -72,11 +65,10 @@
                     border: 2px solid $color_principal ;
                     width: 100%;
                     }
-
                 }
             }
-
         }
+
         .boton-container{
             display: flex;
             justify-content: center;
@@ -87,5 +79,4 @@
             }
         }
     }
-
 }
