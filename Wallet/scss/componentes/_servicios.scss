@@ -1,0 +1,102 @@
+#servicios{
+
+    @include separador_secciones($margin_sections,$padding_sections);
+
+    @media screen and (min-width:768px) and (max-width:991px){ 
+        @include separador_secciones($margin_sections*1.5,$padding_sections);
+    } 
+
+    @media screen and (min-width:577px)and (max-width:768px){
+        @include separador_secciones($margin_sections*1.5,$padding_sections/1.5);
+    }
+
+    @media screen and (min-width:0px)and (max-width:576px){
+        @include separador_secciones($margin_sections/2,$padding_sections/2);
+    }
+    
+    h2{
+        @include titulos_seccion(7vh,nth($size_fuente,3));
+
+        @media only screen and (max-width:991px){
+            text-align: center;
+            padding: 7vh 0vh;
+        }   
+        
+        @media screen and (min-width:0px)and (max-width:576px){
+            font-size: nth($size_fuente,5);
+            padding: 5vh 0vh;
+        }
+    }
+
+    .servicios-container{
+        display: flex;
+        align-items: center;
+        justify-content: space-around;
+        
+
+            @media only screen and (max-width:991px){
+                flex-direction: column;
+                margin-bottom: 10vh;
+            } 
+
+        .item-servicios{ 
+           
+        
+            @media only screen and (max-width:991px){
+                max-width: 400px;
+                margin-bottom: 10vh;
+            } 
+            @media screen and (min-width:0px)and (max-width:576px){
+                max-width: 300px;  
+                
+            }             
+
+            .card{
+                display: flex;
+                height: 420px;
+                border-radius: 10px;             
+                text-align: center;
+                background-color: $color_fondo_cards;              
+
+                @media screen and (min-width:0px)and (max-width:576px){
+                    height: 320px;
+                }    
+
+                &:hover{
+                    box-shadow: rgba($color_principal, 0.5) 0px 10px 20px; 
+                    -webkit-transition:all 1s;
+                    -o-transition:all 1s ;
+                    -moz-transition:all 1s;
+                    transition:all 1s;
+                }   
+                img{
+                   max-width: 270px;
+                   width: 85%;
+                    }
+
+            }
+
+        .card-body{
+            display:flex;
+            align-items:center;
+            justify-content: center;
+            //height: 150px;
+            
+            .card-text{
+                color: $color_text_normal;
+                font-family: nth($tipo_fuente,1),nth($tipo_fuente,2);
+                font-size: nth($size_fuente_px,1);
+                font-weight: 600;   
+
+                @media screen and (min-width:0px)and (max-width:576px){
+                    font-size: nth($size_fuente_px,5);
+                    
+                } 
+            }
+            
+           }
+        }
+    }
+}
+
+    

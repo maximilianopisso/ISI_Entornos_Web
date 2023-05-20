@@ -1,0 +1,15 @@
+
+
+
+@mixin separador_secciones($margintop,$paddingtop) {
+    margin-top: $margintop;
+    padding-top: $paddingtop;
+}
+
+
+@mixin titulos_seccion ($padding_Y,$size_font){
+    font-size: $size_font;
+    font-weight: 700;
+    padding-bottom: $padding_Y;
+    color: darken($color_principal,20%);
+}

@@ -1,0 +1,166 @@
+/* CSS General */
+*{
+    margin: 0px;
+    padding: 0px;
+}
+#bodyLogin{
+    background-image: linear-gradient(180deg,#fff 20%, #33ce7942 100%);
+    background-repeat:no-repeat; 
+}
+
+/*Separaciones de secciones */
+#inicio{
+    margin: 7vh auto;
+}
+
+#inicio h1{
+    color: #215237;
+    font-size: 1.9rem;
+}
+
+/* CSS Header */
+.logo{
+    font-size: 30px;
+}
+
+.estilos-menu {
+
+    background-color: #2a8d56;
+    color: white;
+    font-weight: bold;
+   
+}
+.nav-link{
+    font-size: 20px;
+    margin: 0px 10px;
+    padding: 5px 15px !important;
+    color:white !important;
+}
+.nav-link:hover{
+    background-color: #3bce7d;
+    color:white !important;
+    border-radius: 5px;
+}
+
+
+/* CSS PARA EL LOGIN */
+
+.icono-login{
+    max-width:50%;
+    max-width: 150px;   
+}
+#formularioLogin{
+    width: 80%;
+    margin: 0px auto;
+}
+#formularioLogin input{
+    background-color: white !important;
+    margin: 0px auto;
+    font-size: 15px;
+    font-weight: 500;
+    color:rgb(48, 47, 47);
+}
+
+#formularioLogin label{
+    margin: 2vh 0 1vh 0px;
+    font-size: 15px;
+    font-weight: 700;
+    color:rgb(48, 47, 47);
+}
+
+.mensaje-container{
+    width: 100%;
+    height: 30px;
+    margin: 1vh 0vw;
+    text-align: center;
+}
+#msjerror{  
+    display: none;
+    background-color: rgb(207, 40, 40);
+    color: white;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 0px 20px;
+    border-radius: 5px;
+}
+
+#formularioLogin #boton{
+    font-size: 18px;
+    font-weight: 500;
+    background-color: #2a8d56 ;
+    margin-top: 2vh;
+ 
+}
+
+
+/* CSS SIMULADOR */
+
+
+#esterilizer{
+    margin: 2vh auto;
+}
+
+#esterilizer h1{
+    color: #215237;
+    font-size: 2rem;
+    margin: 4vh 0vw;
+}
+
+#esterilizer h2{
+    color:rgb(48, 47, 47);
+    font-size: 1.4rem;
+    margin: 5vh 0vw 3vh 0vw;
+}
+
+#esterilizer h3{
+    background-color: #2a8d56 ;
+    color:white;
+    font-size: 1.5rem;
+    padding: 1vh 1vw;
+    margin: 2vh 0vw;
+}
+
+#formProcesamiento{
+    display: flex;
+    align-items: center;
+}
+
+#formProcesamiento #calcular{
+    font-size: 18px;
+    font-weight: 500;
+    background-color: #2a8d56 ;
+}
+    
+#formProcesamiento select, #formProcesamiento input {
+    font-size: 20px; 
+    background-color: white;
+    font-weight: 500;
+    color:rgb(48, 47, 47);
+}
+
+#formProcesamiento label{
+    margin: 2vh 0vw 1vh 0vw;
+    font-size: 18px;
+    font-weight: 700;
+    color:rgb(48, 47, 47);
+}
+
+/* CSS Tabla */
+
+#puntaje th{
+    font-weight: 700;
+    font-size: 20px;  
+}
+#puntaje tr{
+    font-weight: 500;
+    font-size: 20px;
+}
+#movimientos th{
+    font-weight: 700;
+    font-size: 20px;
+}
+#movimientos tr{
+    font-weight: 500;
+    font-size: 15px;
+}
+       
