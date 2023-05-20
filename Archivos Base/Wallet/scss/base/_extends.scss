@@ -1,0 +1,29 @@
+%botones{
+font-size: nth($size_fuente,6);
+        color: darken($color_principal,30%);
+        background-color: rgb(255, 226, 59);
+        border-radius: 5px;
+        padding: 10px 30px;
+        font-weight: bold;
+        text-decoration: none; 
+
+            @media screen and (max-width:768px){
+                font-size: nth($size_fuente_px,3);
+                padding: 10px 30px;
+               
+            }
+
+        &:hover{
+            background-color:#8842c1;;
+            color: white;
+            padding: 10px 40px;
+            -webkit-transition:all 1s;
+            -o-transition:all 1s ;
+            -moz-transition:all 1s;
+            transition:all 1s;
+
+            @media screen and (max-width:768px){
+                padding: 10px 30px;     
+            }
+        }
+    }
