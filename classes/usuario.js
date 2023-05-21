@@ -2,7 +2,6 @@ const NUMINTENTOS = 3;
 class Usuario {
 
     constructor(nombre, apellido, email, password, contacto, sexo, movimientos) {
-
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
@@ -23,39 +22,36 @@ class Usuario {
      * @returns 
      */
     validarLogin(email, password) {
-
         let respuesta = [false, 0]
-
-
-        if (this.nroIntentos > 0) {   // Verifica condicion de nro de intentos
-
-            if ((this.email == email) && (this.password == password)) {    // Busca coincidencia por mail y contraseña (validacion)
+        // Verifica condicion de nro de intentos
+        if (this.nroIntentos > 0) {
+            // Evaua condicion para permitir el login del usuario
+            if ((this.email == email) && (this.password == password)) {
                 respuesta = [true, 0];
-                this.resetNroIntentos();  //reset de numeros de intentos del usuario
+                //resetea cantidad de intentos 
+                this.resetNroIntentos();
                 console.log("Al usuario: " + email + " se le restauraron sus " + (this.nroIntentos) + " intentos restantes");
-
             } else {
-
-
-                if ((this.email == email)) {   // Busca coincidencia por mail (condicion para evaluar nro intentos)
+                // Evalua si el mail coincide, para determinar si hay que restar intentos
+                if ((this.email == email)) {
                     this.nroIntentos -= 1;
                     console.log("El usuario: " + email + " tiene " + (this.nroIntentos) + " intentos restantes");
-                    respuesta = [true, 1] // error de contraseña
-
+                    // Error de contraseña
+                    respuesta = [true, 1]
                 } else {
-
-                    respuesta = [false, 2];      // usuario o contraseña invalidos     
+                    // Error de usuario o contraseña invalidos
+                    respuesta = [false, 2];
                 }
             }
         } else {
             if (this.email == email) {
-                respuesta = [true, 3]       //usuario bloqueado
+                // Usuario bloqueado
+                respuesta = [true, 3]
             } else {
-                respuesta = [false, 2];      //usuario bloqueado pero no el buscado
+                // Usuario bloqueado pero no el buscado
+                respuesta = [false, 2];
             }
-
         }
-
         return respuesta;
     }
 
@@ -67,21 +63,16 @@ class Usuario {
      * @param {*} cuentaDestino Cuenta con la que se realiza la operacion
      */
     registrarMovimiento(fecha, puntaje, descripcion, cantDias) {
-
         //definir descripcion del movimiento
         let lote = JSON.parse(localStorage.getItem(`idLote`));
         //console.log(lote);
         let numUltimoMov = this.movimientos.length + 1;
-
         //fecha elaboracion
-
         let fechaElaboracion = formatearFecha(fecha, 0, `/`);
         let fechaVencimiento = formatearFecha(fecha, cantDias, `/`);
-
         let movEsterilizacion = new Movimiento(numUltimoMov, fechaElaboracion, lote, descripcion, puntaje, cantDias, fechaVencimiento);
         // console.log(movEsterilizacion);
         this.movimientos.push(movEsterilizacion);
-
         //console.log(this.movimientos)
         // SUMO 1 AL LOTE PARA EL PROXIMO LOTE Y SE GUARDA EN EL LS
         lote += 1;
@@ -91,26 +82,20 @@ class Usuario {
     mostrarResultado() {
         let acumulador = ``;
         let ultimoRegistro = this.movimientos.length - 1
-
         acumulador += `<tr>
                     <td>${this.movimientos[ultimoRegistro].puntaje} pts</td>
                     <td>${this.movimientos[ultimoRegistro].diasEsteriles} días</td>
                     <td>${this.movimientos[ultimoRegistro].vencimiento}</td>
                 </tr>`
-
         document.getElementById(`detalleResultadoTabla`).innerHTML = acumulador;
     }
 
     /**
      * Muesta Todos los movimientos que ha realizado el usuario
      */
-
     mostrarMovimientos() {
-
         let acumulador = ``;
-
         for (let i = 0; i < this.movimientos.length; i++) {
-
             acumulador += `<tr>
                 <td>${i + 1}</td>
                 <td>${this.movimientos[i].fecha}</td>
@@ -121,9 +106,7 @@ class Usuario {
                 <td>${this.movimientos[i].vencimiento}</td>
             </tr>`
         }
-
         document.getElementById(`detalleMovTabla`).innerHTML = acumulador;
-
     }
 
     /**

@@ -22,9 +22,9 @@ $("#dia").val(formatearFecha(fechaHoy, 0, `-`));
 
 //SALUDO DE BIENVENIDA
 if (usuarioLogeado.sexo === `M`) {
-    document.getElementById(`msjBienvenida`).innerHTML = `<h1>Bienvenido, ${usuarioLogeado.nombre} ${usuarioLogeado.apellido} <h1>`;
+    document.getElementById(`msjBienvenida`).innerHTML = `<p>Bienvenido: ${usuarioLogeado.nombre}, ${usuarioLogeado.apellido}</p>`;
 } else {
-    document.getElementById(`msjBienvenida`).innerHTML = `<h1>Bienvenida, ${usuarioLogeado.nombre} ${usuarioLogeado.apellido} <h1>`;
+    document.getElementById(`msjBienvenida`).innerHTML = `<p>Bienvenida: ${usuarioLogeado.nombre}, ${usuarioLogeado.apellido}</p>`;
 }
 
 // MUESTRO LOS MOVIMIENTOS ANTERIORES
@@ -172,7 +172,7 @@ function calcularPuntajeProceso(envoltorio1, envoltorio2, embalaje, medioAlm, lu
         case "Deposito Material":
             puntaje += 75
             proceso += "DM"
-                break;
+            break;
         case "Deposito Material Estéril":
             puntaje += 250
             proceso += "DME"
@@ -185,11 +185,11 @@ function calcularPuntajeProceso(envoltorio1, envoltorio2, embalaje, medioAlm, lu
             puntaje += 50
             proceso += "O.Ef"
             break;
-       
+
     }
     resultados[0] = puntaje;
     resultados[1] = proceso;
-  
+
     return resultados;
 }
 
@@ -236,20 +236,20 @@ function calcularDiasEsterilidad(puntaje) {
             puntaje: 750,
             vencimiento: 730
         },
-    ]   
+    ]
 
     let diasVenc = 0
 
-        for (let i=0;i<listapunjates.length;i++){
-            const puntajeDato = listapunjates[i]
+    for (let i = 0; i < listapunjates.length; i++) {
+        const puntajeDato = listapunjates[i]
 
-            if (puntaje < puntajeDato.puntaje){
-                diasVenc = puntajeDato.vencimiento;
-                break;
-            }else{
-                diasVenc = 1826;
-            }
+        if (puntaje < puntajeDato.puntaje) {
+            diasVenc = puntajeDato.vencimiento;
+            break;
+        } else {
+            diasVenc = 1826;
         }
+    }
 
     return diasVenc;
 }
