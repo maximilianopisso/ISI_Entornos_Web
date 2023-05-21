@@ -1,5 +1,5 @@
 #inicio {
-
+    
     @include separador_secciones($margin_sections, $padding_sections);
 
     @media screen and (min-width:0px)and (max-width:576px) {

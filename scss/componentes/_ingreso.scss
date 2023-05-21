@@ -1,4 +1,5 @@
 #ingreso {
+    
     display: flex;
     justify-content: center;
     padding-bottom: $padding_sections ;
@@ -43,7 +44,6 @@
                         justify-content: center;
                         margin-bottom: 7vh;
                     }
-
 
                     img {
                         display: block;
@@ -105,15 +105,11 @@
 
 
                         }
-
-
                     }
                 }
             }
         }
     }
-
-
 
     .boton {
         @extend %botones;
