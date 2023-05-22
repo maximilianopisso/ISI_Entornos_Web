@@ -28,7 +28,7 @@ if (usuarioLogeado.sexo === `M`) {
 }
 
 // MUESTRO LOS MOVIMIENTOS ANTERIORES
-usuarioLogeado.mostrarMovimientos();
+// usuarioLogeado.mostrarMovimientos();
 
 
 $("#formProcesamiento").submit(function (e) {
