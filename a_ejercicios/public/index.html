@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de datos</title>
+</head>
+
+<body>
+    <main>
+        <h1>Formulario de Datos</h1>
+        <form action="datos.php" method="post">
+            <p><label>Nombre: <input type="text" name="nombre" value="" required maxlength="50"></label></p>
+            <p><label>Email: <input type="email" name="email" value="" required></label></p>
+            <p><label>Sexo: <select name="sexo" required>
+                        <option value="" selected>Seleccionar...</option>
+                        <option value="hombre">Hombre</option>
+                        <option value="mujer">Mujer</option>
+                    </select></label></p>
+            <p>Ubicación:
+                <label>Argentina <input type="radio" name="ubicacion" value="argentina" required></label>
+                <label>Otra <input type="radio" name="ubicacion" value="otra"></label>
+            </p>
+            <p><label>Servicios:<select name="selServicios[]" multiple>
+                        <option value="servicios1" selected>Servicios 1</option>
+                        <option value="servicios2">Servicios 2</option>
+                        <option value="servicios3">Servicios 3</option>
+                        <option value="servicios4">Servicios 4</option>
+                        <option value="servicios5">Servicios 5</option>
+                    </select>
+                </label>
+            </p>
+            <p><label>Mensaje: <textarea name="mensaje" rows="5" cols="30" maxlength="2000"></textarea></label></p>
+            <p><label>¿Acepta condiciones del servicio? <input type="checkbox" name="aceptaCondiciones" value="on"
+                        required></label></p>
+            <p><input type="submit" name="btnEnviar" value="Enviar"></p>
+        </form>
+    </main>
+</body>
+
+</html>

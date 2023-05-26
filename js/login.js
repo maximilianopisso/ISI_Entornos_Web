@@ -69,7 +69,7 @@ function validarUsuario(email, password) {
         }
     }
     if (encontrado) {
-        location.href = "./home.html";
+        location.href = "./home.php";
     } else {
         msjErrorLogin(respuesta[1], indice_error);
     }

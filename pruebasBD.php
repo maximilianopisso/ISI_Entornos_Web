@@ -3,7 +3,7 @@ require_once 'php\classes\database.php';
 
 $database = new Database();
 $filasAfectada = 0;
-$resultado = $database->selectUsuariosByName("%a");
+$resultado = $database->getUsuarioByEmail("%a");
 ?>
 
 <!DOCTYPE html>
@@ -76,48 +76,48 @@ $resultado = $database->selectUsuariosByName("%a");
         <!-- inicio -->
         <section id="inicio" class="container">
             <h1>Pruebas BD</h1>
-          
-
-                <?php
-                // var_dump($resultado);
-                foreach ($resultado[0] as $filas) {
-                    echo var_dump($filas) . '<br>' . '<br>' . '<br>';
-                }
-                // $capa1 = $resultado[0];
-                // echo "<br> <br>";
-                // var_dump($capa1);
-                // echo "<br> <br>";
-                foreach ($resultado[0] as $usuario) {
-                    echo "nombre: " . $usuario["user_nombre"] . "<br>";
-                    echo "apellido: " . $usuario["user_apellido"] . "<br>";
-                    echo "email: " . $usuario["user_email"] . "<br>";
-                    echo "habilitado: " . $usuario["user_habilitado"] . "<br><br>";
-                    $filasAfectada += 1;
-                }
-                echo "Registros: " . $filasAfectada . "<br><br>";
-                // foreach ($resultado as $elemento) {
-                //     // Iterar sobre los campos del elemento
-                //     foreach ($elemento as $clave => $valor) {
-                //         // Verificar si el campo comienza con "user_"
-                //         if (strpos($clave, 'user_') === 0) {
-                //             echo "$valor <br>";
-                //         }
-                //     }
-                // }
-                // foreach ($resultado as $level1) {
-                //     foreach ($level1 as $level2) {
-                //         echo "user_id: " . $level2["user_id"] . "<br>";
-                //         echo "user_nombre: " . $level2["user_nombre"] . "<br>";
-                //         // Mostrar el resto de los elementos...
-                //         echo "<br>";
-                //         $filasAfectada += 1;
-                //     }
-                // }
-                // echo "FILAS: " . $filasAfectada . "<br>";
-                ?>
 
 
-           
+            <?php
+            // var_dump($resultado);
+            foreach ($resultado[0] as $filas) {
+                echo var_dump($filas) . '<br>' . '<br>' . '<br>';
+            }
+            // $capa1 = $resultado[0];
+            // echo "<br> <br>";
+            // var_dump($capa1);
+            // echo "<br> <br>";
+            foreach ($resultado[0] as $usuario) {
+                echo "nombre: " . $usuario["user_nombre"] . "<br>";
+                echo "apellido: " . $usuario["user_apellido"] . "<br>";
+                echo "email: " . $usuario["user_email"] . "<br>";
+                echo "habilitado: " . $usuario["user_habilitado"] . "<br><br>";
+                $filasAfectada += 1;
+            }
+            echo "Registros: " . $filasAfectada . "<br><br>";
+            // foreach ($resultado as $elemento) {
+            //     // Iterar sobre los campos del elemento
+            //     foreach ($elemento as $clave => $valor) {
+            //         // Verificar si el campo comienza con "user_"
+            //         if (strpos($clave, 'user_') === 0) {
+            //             echo "$valor <br>";
+            //         }
+            //     }
+            // }
+            // foreach ($resultado as $level1) {
+            //     foreach ($level1 as $level2) {
+            //         echo "user_id: " . $level2["user_id"] . "<br>";
+            //         echo "user_nombre: " . $level2["user_nombre"] . "<br>";
+            //         // Mostrar el resto de los elementos...
+            //         echo "<br>";
+            //         $filasAfectada += 1;
+            //     }
+            // }
+            // echo "FILAS: " . $filasAfectada . "<br>";
+            ?>
+
+
+
         </section>
 
         <!-- nosotros -->
@@ -261,7 +261,7 @@ $resultado = $database->selectUsuariosByName("%a");
                         </div>
                     </div>
                     <div class="col-12 d-flex justify-content-center">
-                        <a href="login.html" class="boton">Ingresar</a>
+                        <a href="login.php" class="boton">Ingresar</a>
                     </div>
                 </div>
             </div>

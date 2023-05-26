@@ -12,29 +12,30 @@ class Usuario
     private $sexo;
     private $nroIntentos;
     private $habilitado;
-    public function __construct()
-    {
-        $this->nombre = 0;
-        $this->nombre = "";
-        $this->apellido = "";
-        $this->email = "";
-        $this->password = "";
-        $this->contacto = "";
-        $this->sexo = "";
-        $this->nroIntentos = 3;
-        $this->habilitado = 1;
-    }
-    // public function __construct($id, $nombre, $apellido, $email, $password, $contacto, $sexo)
+    // public function __construct()
     // {
-    //     $this->nombre = $nombre;
-    //     $this->apellido = $apellido;
-    //     $this->email = $email;
-    //     $this->password = $password;
-    //     $this->contacto = $contacto;
-    //     $this->sexo = $sexo;
+    //     $this->nombre = 0;
+    //     $this->nombre = "";
+    //     $this->apellido = "";
+    //     $this->email = "";
+    //     $this->password = "";
+    //     $this->contacto = "";
+    //     $this->sexo = "";
     //     $this->nroIntentos = 3;
-    //     $this->habilitado = true;
+    //     $this->habilitado = 1;
     // }
+    public function __construct($id, $nombre, $apellido, $email, $password, $contacto, $sexo, $intentos, $habilitado)
+    {
+        $this->id = $id;
+        $this->nombre = $nombre;
+        $this->apellido = $apellido;
+        $this->email = $email;
+        $this->password = $password;
+        $this->contacto = $contacto;
+        $this->sexo = $sexo;
+        $this->nroIntentos = $intentos;
+        $this->habilitado = $habilitado;
+    }
 
     // GETTERS
     public function getNombre()
@@ -119,39 +120,30 @@ class Usuario
     {
         //
         try {
-
-            $nroIntentos = $this->getNroIntentos();
-            if ($nroIntentos == 0) {
-                if ($this->habilitado !== 1) {
+            //Validacion Intentos
+            if ($this->nroIntentos === 0) {
+                if ($this->habilitado === 1) {
                     $this->inhabilitarUsuario();
                 }
-                throw new Exception("Usuario Bloqueado", 200);
+                throw new Exception("Usuario superó intentos. Usuario inhabilidado", 200);
             }
 
+            //Validacion Inhabilitado
             $habilitado = $this->getHabilitado();
             if ($habilitado !== 1) {
-                throw new Exception("Usuario Inhabilitado", 201);
+                throw new Exception("El usuario se encuentra inhabilitado", 201);
             }
 
-            // Recuperar la clave de la base de datos 
-            $this->email = 'mpisso@gmail.com';
-            $this->password = '7e713a2eef2ca385b216ad6722b58558de3cad1f6e016f2cd1bdffac62d22d0d';
-
-            // Cifrar clave que entra por formulario
+            // Encripta clave ingresada por formulario.
             $claveCifrada = $this->cifrarClave($clave);
-            Utils::screenMsj(var_dump($this->password));
-            Utils::screenMsj(var_dump($clave));
-            Utils::screenMsj(var_dump($claveCifrada));
 
             // Verificar la clave ingresada con la versión cifrada almacenada en la base de datos
-            if ($claveCifrada == $this->password && $this->email == $email) {
-                Utils::screenMsj("Usuario válido");
+            if ($claveCifrada === $this->password && $this->email === $email) {
                 return true;
             } else {
                 if ($this->email == $email) {
                     $this->restarNroIntentos($email);
                 }
-                Utils::screenMsj("Credenciales invalidas");
                 return false;
             }
         } catch (Exception $e) {
@@ -203,7 +195,3 @@ class Usuario
         return $clave_cifrada;
     }
 }
-
-$usuario = new Usuario();
-$usuario->validarUsuario("mpisso@gmail.com", "clave1111");
-var_dump($usuario);

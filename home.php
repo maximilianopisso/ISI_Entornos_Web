@@ -1,3 +1,13 @@
+<?php
+require_once './php/classes/database.php';
+require_once './php/classes/usuario.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $email = (isset($_POST['email']) && is_string($_POST['email'])) ? trim($_POST['email']) : '';
+  $password = (isset($_POST['password']) && is_string($_POST['password'])) ? trim($_POST['password']) : '';
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -9,8 +19,7 @@
   <!-- Meta Tags -->
   <meta name="description" content=" Esta es la Home de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
            y transferencias de dinero se hagan a través de Internet." />
-  <meta name="keywords"
-    content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
+  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
 
   <!-- Opengraph -->
   <meta property="og:title" content="Home | IBWallet | Tu Billetera Digital" />
@@ -22,8 +31,7 @@
   <title>Home | IBWallet | Tu Billetera Digital </title>
 
   <!-- Boostrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
   <!-- CSS -->
   <link rel="stylesheet" href="./css/style.css">
@@ -47,14 +55,13 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container-fluid nav-container">
         <a class="navbar-brand" href="#">IBWallet</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Menu Principal">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Menu Principal">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="./login.html">Cerrar Sesion</a>
+              <a class="nav-link" href="./login.php">Cerrar Sesion</a>
             </li>
           </ul>
         </div>
@@ -74,6 +81,55 @@
     <div id="cuentas" class="row align-items-start ">
       <div class="col-12">
         <div>
+          <h3>RESPUESTAS BD</h3>
+          <?php
+
+          try {
+            echo '<br><p style="font-weight:700">DATOS FORMULARIO:</p>';
+            Utils::screenMsj("EMAIL: " . $email);
+            Utils::screenMsj("PASSWORD: " . $password);
+
+            if (!is_string($email) || !is_string($password)) {
+              throw new Exception(" Error en login.php", 201);
+            }
+
+            $database = new Database();
+            $resultado = $database->getUsuarioByEmail($email);
+
+            if (!$resultado) {
+              throw new Exception("Usuario no existe", 202);
+            } else {
+              echo '<br><p style="font-weight:700">USUARIO DESDE BD:</p>';
+              Utils::mostrarRegistro($resultado);
+              $user2 = $resultado[0];
+              $user = $user2[0];
+              $usuario = new Usuario(
+                $user["user_id"],
+                $user["user_nombre"],
+                $user["user_apellido"],
+                $user["user_email"],
+                $user["user_password"],
+                $user["user_contacto"],
+                $user["user_sexo"],
+                $user["user_intentos"],
+                $user["user_habilitado"],
+              );
+
+              echo '<br><p style="font-weight:700">RESULTADO VALIDACION USER:</p>';
+              $validacion = $usuario->validarUsuario($email, $password);
+              if ($validacion) {
+                Utils::screenMsj('<p style="color:green; font-weight:700">Credenciales válido</p3>');
+              } else {
+                Utils::screenMsj('<p style="color:red; font-weight:700">Credenciales inválido</p3>');
+              }
+            }
+          } catch (Exception $e) {
+            Utils::msjCodigoError($e->getCode(), $e);
+          }
+
+          ?>
+          <hr>
+          <br>
           <h3>Cuentas</h3>
           <hr>
           <br>
@@ -121,10 +177,8 @@
     <div class="row align-items-center pb-2 mb-5">
       <form id="operaciones" class="row g-2">
         <div class="col-lg-12 col-md-12 text-center pt-4">
-          <button id="transferencias" type="submit" class="btn btn-primary"><a href="transferencias.html"
-              style="color: white; text-decoration: none;">Transferencias</a></button>
-          <button id="movimientos" type="submit" class="btn btn-success"><a href="movimientos.html"
-              style="color: white; text-decoration: none;">Ver Movimientos</a></button>
+          <button id="transferencias" type="submit" class="btn btn-primary"><a href="transferencias.html" style="color: white; text-decoration: none;">Transferencias</a></button>
+          <button id="movimientos" type="submit" class="btn btn-success"><a href="movimientos.html" style="color: white; text-decoration: none;">Ver Movimientos</a></button>
         </div>
       </form>
     </div>
