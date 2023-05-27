@@ -10,16 +10,19 @@ class Database
 
     public function __construct()
     {
-        $this->conexion = new mysqli($this->host, $this->username, $this->password, $this->database);
-
-        if ($this->conexion->connect_error) {
-            throw new Exception($this->conexion->connect_error, 100);
-        } else {
+        try {
+            $this->conexion = new mysqli($this->host, $this->username, $this->password, $this->database);
             $this->conexion->set_charset('utf8mb4');
+
+            if ($this->conexion->connect_error) {
+                throw new Exception($this->conexion->connect_error, 100);
+            }
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
         }
     }
 
-    public function executeQuery($query, $params = [])
+    public function executeSelectQuery($query, $params = [])
     {
         $filasAfectadas = 0;
         $data = [];
@@ -30,26 +33,59 @@ class Database
             if (!$sentencia) {
                 throw new Exception($this->conexion->error, 101);
             }
-
+            // En caso de tener parametros, se preparan los tipos de parametros
             if (!empty($params)) {
                 $tipoDatos = $this->getTypeData($params);
                 $sentencia->bind_param($tipoDatos, ...$params);
             }
-
+            // Ejecuta la sentencia SQL
             if (!$sentencia->execute()) {
                 throw new Exception($this->conexion->error, 102);
             }
 
             $resultado = $sentencia->get_result();
-            $data[] = $resultado->fetch_all(MYSQLI_ASSOC);
             $filasAfectadas = $sentencia->affected_rows;
+            $data = $resultado->fetch_all(MYSQLI_ASSOC);
             $sentencia->close();
 
             return array($data, $filasAfectadas);
         } catch (Exception $e) {
-            Utils::msjCodigoError($e->getCode(), $e);
+            throw new Exception($e, $e->getCode());
             // echo "Error al ejecutar la consulta: " . $sentencia->error;
-            return false;
+            // return false;
+        }
+    }
+
+    public function executeUpdateQuery($query, $params = [])
+    {
+        $filasAfectadas = 0;
+        $data = [];
+
+        try {
+            $sentencia = $this->conexion->prepare($query);
+
+            if (!$sentencia) {
+                throw new Exception($this->conexion->error, 101);
+            }
+            // En caso de tener parametros, se preparan los tipos de parametros
+            if (!empty($params)) {
+                $tipoDatos = $this->getTypeData($params);
+                $sentencia->bind_param($tipoDatos, ...$params);
+            }
+            // Ejecuta la sentencia SQL
+            if (!$sentencia->execute()) {
+                throw new Exception($this->conexion->error, 102);
+            }
+
+            $resultado = $sentencia->get_result();
+            $filasAfectadas = $sentencia->affected_rows;
+            $sentencia->close();
+
+            return array($resultado, $filasAfectadas);
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+            // echo "Error al ejecutar la consulta: " . $sentencia->error;
+            // return false;
         }
     }
 
@@ -77,18 +113,16 @@ class Database
 
     public function getUsuarioByEmail($email)
     {
-        // Consulta SELECT con parámetros
         $query = "SELECT * FROM usuarios WHERE user_email = ?";
-        //Parametros
         try {
-            $resultado = $this->executeQuery($query, [$email]);
+            $resultado = $this->executeSelectQuery($query, [$email]);
             if ($resultado[1] !== 0) {
                 return $resultado[0];
             } else {
                 return false;
             };
         } catch (Exception $e) {
-            Utils::msjCodigoError($e->getCode(), $e);
+            throw new Exception($e, $e->getCode());
         } finally {
             // Cerrar la conexión a la base de datos
             $this->closeDatabase();
@@ -97,18 +131,16 @@ class Database
 
     public function existeUsuario($email)
     {
-        // Consulta SELECT con parámetros
         $query = "SELECT * FROM usuarios WHERE user_email = ?";
-        //Parametros
         try {
-            $resultado = $this->executeQuery($query, [$email]);
+            $resultado = $this->executeSelectQuery($query, [$email]);
             if ($resultado[1] !== 0) {
                 return true;
             } else {
                 return false;
             };
         } catch (Exception $e) {
-            echo 'Código ' . $e->getCode() . ' - ' . $e->getMessage();
+            throw new Exception($e, $e->getCode());
         } finally {
             // Cerrar la conexión a la base de datos
             $this->closeDatabase();

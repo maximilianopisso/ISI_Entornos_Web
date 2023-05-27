@@ -6,13 +6,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = (isset($_POST['email']) && is_string($_POST['email'])) ? trim($_POST['email']) : '';
   $password = (isset($_POST['password']) && is_string($_POST['password'])) ? trim($_POST['password']) : '';
 }
+try {
+  if (!is_string($email) || !is_string($password)) {
+    throw new Exception(" Error en login.php", 201);
+  }
+  $database = new Database();
+  $resultado = $database->getUsuarioByEmail($email);
+  if (!$resultado) {
+    throw new Exception("Usuario no existe", 202);
+  } else {
+    $user2 = $resultado;
+    $user = $user2[0];
+    $usuario = new Usuario(
+      $user["user_id"],
+      $user["user_nombre"],
+      $user["user_apellido"],
+      $user["user_email"],
+      $user["user_password"],
+      $user["user_contacto"],
+      $user["user_sexo"],
+      $user["user_intentos"],
+      $user["user_habilitado"],
+    );
+  }
+  $validacion = $usuario->validarUsuario($email, $password);
+} catch (Exception $e) {
+  echo "<br>";
+  echo "<br>";
+  echo "<br>";
+  echo "<br>";
+  echo "<br>";
+  $error = $e->getMessage();
+  echo $error;
+  $pos = strpos($error, "C:", true);
+  $shortError = substr($error, 0, $pos - 4);
+  echo '<script>alert("Codigo Error ' . $e->getCode() . ': ' . $shortError  .  '");</script>';
+}
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" style="background-color: white; height: 100%;">
 
 <head>
-  <meta charset="UTF-8">
+  <meta charset=" UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
@@ -41,17 +77,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
 
   <!-- JScript -->
-  <script src="./js/classes/usuario.js"></script>
+  <!-- <script src="./js/classes/usuario.js"></script>
   <script src="./js/classes/movimiento.js"></script>
   <script src="./js/driverLocalStore.js" defer></script>
-  <script src="./js/main.js" defer></script>
+  <script src="./js/main.js" defer></script> -->
 
 </head>
 
-<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 700px;">
+<body id="">
 
   <!-- header -->
-  <header class="fixed-top">
+  <header class=" fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container-fluid nav-container">
         <a class="navbar-brand" href="#">IBWallet</a>
@@ -69,119 +105,109 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </nav>
   </header>
 
-  <!-- inicio -->
+  <!-- home -->
   <section id="home" class="container">
     <br>
     <br>
     <br>
     <br>
-    <p style="color: #87698d; font-size: 1em; text-align: right;" id="msjBienvenida">Bienvenido:
-    </p>
+    <?php
+    $sexo = $usuario->getSexo();
+    $bienvenida = "";
+    switch ($sexo) {
+      case 'M':
+        $bienvenida = 'Bienvenido: ' . $usuario->getNombre() . ', ' . $usuario->getApellido();
+        break;
+      case 'F':
+        $bienvenida = 'Bienvenida: ' . $usuario->getNombre() . ', ' . $usuario->getApellido();
+        break;
+      default:
+        $bienvenide = 'Bienvenide: ' . $usuario->getNombre() . ', ' . $usuario->getApellido();
+        break;
+    }
+    echo '<p style="color: #87698d; font-size: 1em; text-align: right;" id="msjBienvenida">' . $bienvenida . '</p>';
+    ?>
     <br>
     <div id="cuentas" class="row align-items-start ">
       <div class="col-12">
         <div>
           <h3>RESPUESTAS BD</h3>
           <?php
-
-          try {
-            echo '<br><p style="font-weight:700">DATOS FORMULARIO:</p>';
-            Utils::screenMsj("EMAIL: " . $email);
-            Utils::screenMsj("PASSWORD: " . $password);
-
-            if (!is_string($email) || !is_string($password)) {
-              throw new Exception(" Error en login.php", 201);
-            }
-
-            $database = new Database();
-            $resultado = $database->getUsuarioByEmail($email);
-
-            if (!$resultado) {
-              throw new Exception("Usuario no existe", 202);
-            } else {
-              echo '<br><p style="font-weight:700">USUARIO DESDE BD:</p>';
-              Utils::mostrarRegistro($resultado);
-              $user2 = $resultado[0];
-              $user = $user2[0];
-              $usuario = new Usuario(
-                $user["user_id"],
-                $user["user_nombre"],
-                $user["user_apellido"],
-                $user["user_email"],
-                $user["user_password"],
-                $user["user_contacto"],
-                $user["user_sexo"],
-                $user["user_intentos"],
-                $user["user_habilitado"],
-              );
-
-              echo '<br><p style="font-weight:700">RESULTADO VALIDACION USER:</p>';
-              $validacion = $usuario->validarUsuario($email, $password);
-              if ($validacion) {
-                Utils::screenMsj('<p style="color:green; font-weight:700">Credenciales válido</p3>');
-              } else {
-                Utils::screenMsj('<p style="color:red; font-weight:700">Credenciales inválido</p3>');
-              }
-            }
-          } catch (Exception $e) {
-            Utils::msjCodigoError($e->getCode(), $e);
+          echo '<br><p style="font-weight:700">DATOS FORMULARIO:</p>';
+          Utils::screenMsj("EMAIL: " . $email);
+          Utils::screenMsj("PASSWORD: " . $password);
+          $clave_cifrada = hash_hmac('sha256', $password, "IBwallet");
+          Utils::screenMsj("PASSWORD ENCRIPTADA: " . $clave_cifrada);
+          echo '<br><p style="font-weight:700">DATOS USUARIO DESDE BD:</p>';
+          Utils::mostrarUsuarios($resultado);
+          echo '<br><p style="font-weight:700">RESULTADO VALIDACION USER:</p>';
+          if (isset($validacion) && $validacion) {
+            Utils::screenMsj('<p style="color:green; font-weight:700">Credenciales válido</p>');
+          } else {
+            Utils::screenMsj('<p style="color:red; font-weight:700">Credenciales inválido. Intentos restantes: ' . $usuario->getNroIntentos() . '</p>');
+            // echo '<script>alert("Credenciales Invalidas");</script>';
           }
-
           ?>
           <hr>
           <br>
           <h3>Cuentas</h3>
           <hr>
           <br>
-          <table class="table table-hover text-center">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Tipo Cuenta</th>
-                <th scope="col">CBU</th>
-                <th scope="col">Moneda</th>
-                <th scope="col">Saldo</th>
-              </tr>
-            </thead>
-            <tbody id="detalleResultadoTabla">
-              <tr>
-                <td>1</td>
-                <td>CA</td>
-                <td>00754654654645454</td>
-                <td>Pesos</td>
-                <td>$ 65745,12</td>
-              </tr>
-              <tr>
-                <td>2</td>
-                <td>CA</td>
-                <td>00788842236255554</td>
-                <td>Dólares</td>
-                <td>USD 454,12</td>
-              </tr>
-              <tr>
-                <td>3</td>
-                <td>CC</td>
-                <td>00738845555454544</td>
-                <td>Pesos</td>
-                <td>$ 454,12</td>
-              </tr>
-            </tbody>
+          <?php
+          $cuentas = $usuario->obtenerCuentas();
+          if (isset($validacion) && ($validacion || count($cuentas) === 0)) {
+            echo '<table class="table table-hover text-center">';
+            echo '<thead>';
+            echo '<tr>';
+            echo '<th scope="col">#</th>';
+            echo '<th scope="col">Nro. Cuenta</th>';
+            echo '<th scope="col">Tipo Cuenta</th>';
+            echo '<th scope="col">C.B.U.</th>';
+            echo '<th scope="col">Alias</th>';
+            echo '<th scope="col">Moneda</th> ';
+            echo '<th scope="col">Saldo</th> ';
+            echo '</tr> ';
+            echo '</thead> ';
+            echo '<tbody id="detalleResultadoTabla">';
+
+            foreach ($cuentas as $key => $cuenta) {
+              echo '<tr>';
+              echo '<th scope="col">' . $key . '</th>';
+              echo '<td scope="col">' . $cuenta["cue_nro_cuenta"] . '</th>';
+              echo '<td scope="col">' . $cuenta["cue_tipo_cuenta"] . '</th>';
+              echo '<td scope="col">' . $cuenta["cue_cbu"] . '</th>';
+              echo '<td scope="col">' . $cuenta["cue_alias"] . '</th>';
+              echo '<td scope="col">' . $cuenta["cue_tipo_moneda"] . '</th>';
+              if ($cuenta["cue_tipo_moneda"] === "PESO") {
+                echo '<td scope="col"> $ ' . $cuenta["cue_saldo"] . '</th>';
+              } else {
+                echo '<td scope="col"> USD ' . $cuenta["cue_saldo"] . '</th>';
+              }
+              echo '</tr>';
+            }
+          } else {
+            echo '<p style="color:blue; font-weight:700">No posee cuentas asociadas</p>';
+          }
+          ?>
+          </tbody>
           </table>
         </div>
       </div>
     </div>
     <br>
     <br>
-    <h3>Operaciones</h3>
-    <hr>
-    <div class="row align-items-center pb-2 mb-5">
-      <form id="operaciones" class="row g-2">
-        <div class="col-lg-12 col-md-12 text-center pt-4">
-          <button id="transferencias" type="submit" class="btn btn-primary"><a href="transferencias.html" style="color: white; text-decoration: none;">Transferencias</a></button>
-          <button id="movimientos" type="submit" class="btn btn-success"><a href="movimientos.html" style="color: white; text-decoration: none;">Ver Movimientos</a></button>
-        </div>
-      </form>
-    </div>
+    <?php
+    if (isset($validacion) && $validacion && count($cuentas) !== 0) {
+      echo '<h3> Operaciones </h3>';
+      echo '<hr>';
+      echo '<div class="align-items-center py-4 mb-5">';
+      echo '<form id="operaciones" class="d-flex justify-content-center">';
+      echo '<button id="transferencias" type="submit" class="btn btn-primary mx-3"><a href="transferencias.html" style="color: white; text-decoration: none;">Transferencias</a></button>';
+      echo '<button id="movimientos" type="submit" class="btn btn-success mx-3"><a href="movimientos.html" style="color: white; text-decoration: none;">Ver Movimientos</a></button>';
+      echo '</form>';
+      echo ' </div>';
+    }
+    ?>
   </section>
 </body>
 

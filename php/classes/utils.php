@@ -30,9 +30,9 @@ class Utils
         Utils::screenMsj($msj . $error->getMessage());
     }
 
-    public static function mostrarRegistro($registro)
+    public static function mostrarUsuarios($usuarios)
     {
-        foreach ($registro[0] as $usuario) {
+        foreach ($usuarios as $usuario) {
             Utils::screenMsj("id: " . $usuario["user_id"]);
             Utils::screenMsj("nombre: " . $usuario["user_nombre"]);
             Utils::screenMsj("apellido: " . $usuario["user_apellido"]);
@@ -42,6 +42,20 @@ class Utils
             Utils::screenMsj("sexo: " . $usuario["user_sexo"]);
             Utils::screenMsj("nroIntentos: " . $usuario["user_intentos"]);
             Utils::screenMsj("habilitado: " . $usuario["user_habilitado"]);
+        }
+    }
+
+    public static function mostrarCuentas($cuentas)
+    {
+        foreach ($cuentas as $cuenta) {
+            Utils::screenMsj("id: " . $cuenta["cue_id"]);
+            Utils::screenMsj("user id: " . $cuenta["cue_user_id"]);
+            Utils::screenMsj("nro cuenta: " . $cuenta["cue_nro_cuenta"]);
+            Utils::screenMsj("tipo cuenta: " . $cuenta["cue_tipo_cuenta"]);
+            Utils::screenMsj("tipo moneda: " . $cuenta["cue_tipo_moneda"]);
+            Utils::screenMsj("cbu: " . $cuenta["cue_cbu"]);
+            Utils::screenMsj("alias: " . $cuenta["cue_alias"]);
+            Utils::screenMsj("saldos: " . $cuenta["cue_saldo"]);
         }
     }
 }

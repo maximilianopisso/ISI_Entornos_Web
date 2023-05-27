@@ -1,5 +1,6 @@
 <?php
 require 'utils.php';
+require_once 'database.php';
 
 class Usuario
 {
@@ -12,18 +13,7 @@ class Usuario
     private $sexo;
     private $nroIntentos;
     private $habilitado;
-    // public function __construct()
-    // {
-    //     $this->nombre = 0;
-    //     $this->nombre = "";
-    //     $this->apellido = "";
-    //     $this->email = "";
-    //     $this->password = "";
-    //     $this->contacto = "";
-    //     $this->sexo = "";
-    //     $this->nroIntentos = 3;
-    //     $this->habilitado = 1;
-    // }
+
     public function __construct($id, $nombre, $apellido, $email, $password, $contacto, $sexo, $intentos, $habilitado)
     {
         $this->id = $id;
@@ -78,45 +68,95 @@ class Usuario
         return $this->habilitado;
     }
 
-    // SETTERS
-    // public function setCuentas($cuentas)
-    // {
-    //     $this->cuentas = $cuentas;
-    // }
-
-    // public function setMovimientos($movimientos)
-    // {
-    //     $this->cuentas = $movimientos;
-    // }
-
     // METODOS PERSONALIZADOS
     public function resetNroIntentos()
     {
-        $this->nroIntentos = 3;
+        try {
+            $this->nroIntentos = 3;
+            $database = new Database();
+            $query = "UPDATE `usuarios` SET user_intentos = 3 where user_id = ?";
+            $resultado = $database->executeUpdateQuery($query, [$this->id]);
+            // var_dump($resultado);
+            // if ($resultado[1] !== 0) {
+            //     return true;
+            // } else {
+            //     throw new Exception("Error no se pudo reiniciar intentos al usuario", 105);
+            // };
+            //REVISAR SI ESTA BIEN ESTO O COMO ESE PUEDE HACER, PORQUE CUANDO EL VALOR ES 3 DEVUELVA COMO QUE NO HIZO CAMBIOS Y FALLA, CUANDO NO ES UNA FALLA
+
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $database->closeDatabase();
+        }
     }
 
-    public function restarNroIntentos($email)
+    public function restarNroIntentos()
     {
         if ($this->nroIntentos === 0) {
             return false;
         } else {
-            $this->nroIntentos--;
-            return true;
+            try {
+                $this->nroIntentos--;
+                $database = new Database();
+                $query = "UPDATE usuarios SET user_intentos = ? where user_id = ?";
+                $resultado = $database->executeUpdateQuery($query, [$this->nroIntentos, $this->id]);
+                if ($resultado[1] !== 0) {
+                    return true;
+                } else {
+                    throw new Exception("Error no se pudo restar el numero de intentos del usuario", 105);
+                };
+            } catch (Exception $e) {
+                throw new Exception($e, $e->getCode());
+            } finally {
+                $database->closeDatabase();
+            }
         }
     }
 
     public function inhabilitarUsuario()
     {
-        $this->habilitado = 0;
+        try {
+            $this->habilitado = 0;
+            $database = new Database();
+            $query = "UPDATE usuarios SET user_habilitado = ? where user_id = ?";
+            $resultado = $database->executeUpdateQuery($query, [$this->habilitado, $this->id]);
+            if ($resultado[1] !== 0) {
+                return true;
+            } else {
+                throw new Exception("Error no se pudo inhabilitar al usuario", 105);
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $database->closeDatabase();
+        }
     }
 
     public function habilitarUsuario()
     {
-        $this->habilitado = 1;
-        $this->resetNroIntentos();
+        try {
+            $this->habilitado = 1;
+            $database = new Database();
+            $query = "UPDATE `usuarios` SET user_habilitado = 3 where user_id = ?";
+            $resultado = $database->executeUpdateQuery($query, [$this->habilitado]);
+            if ($resultado[1] !== 0) {
+                $this->resetNroIntentos();
+                return true;
+            } else {
+                throw new Exception("Error no se pudo habilitar al usuario", 105);
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $database->closeDatabase();
+        }
     }
 
-    public function validarUsuario($email, $clave)
+    public function validarUsuario(string $email, string $clave)
     {
         //
         try {
@@ -129,8 +169,7 @@ class Usuario
             }
 
             //Validacion Inhabilitado
-            $habilitado = $this->getHabilitado();
-            if ($habilitado !== 1) {
+            if ($this->habilitado !== 1) {
                 throw new Exception("El usuario se encuentra inhabilitado", 201);
             }
 
@@ -139,22 +178,46 @@ class Usuario
 
             // Verificar la clave ingresada con la versión cifrada almacenada en la base de datos
             if ($claveCifrada === $this->password && $this->email === $email) {
+                $this->resetNroIntentos();
                 return true;
             } else {
-                if ($this->email == $email) {
-                    $this->restarNroIntentos($email);
+                if ($this->email === $email) {
+                    $this->restarNroIntentos();
                 }
                 return false;
             }
         } catch (Exception $e) {
-            Utils::screenMsj($e);
+            throw new Exception($e, $e->getCode());
         }
+    }
+    public function cifrarClave($clave)
+    {
+        $secret_key = "IBwallet"; // Secret key for HMAC
+        $clave_cifrada = hash_hmac('sha256', $clave, $secret_key);
+        return $clave_cifrada;
     }
 
 
     public function obtenerCuentas()
     {
+        try {
+            $query = "SELECT * FROM cuentas WHERE cue_user_id = ?";
+            $database = new Database();
+            $resultado = $database->executeSelectQuery($query, [$this->id]);
+            if ($resultado[1] !== 0) {
+                return $resultado[0];
+            } else {
+                return false;
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $database->closeDatabase();
+        }
     }
+
+
 
     public function obtenerMovimientos()
     {
@@ -167,7 +230,6 @@ class Usuario
             "monto" => $monto,
             "fecha" => date("Y-m-d H:i:s")
         ];
-        // $this->movimientos[] = $movimiento;
     }
 
     public function visualizarMovimientos()
@@ -175,23 +237,5 @@ class Usuario
         // // foreach ($this->movimientos as $movimiento) {
         //     echo "Tipo: " . $movimiento['tipo'] . ", Monto: " . $movimiento['monto'] . ", Fecha: " . $movimiento['fecha'] . "<br>";
         // }
-    }
-    public function cifrarClave($clave)
-    {
-        // $salt_fijo = "IBWallet"; // Sal fija que se utilizará en cada cifrado
-
-        // $options = [
-        //     'salt' => $salt_fijo,
-        // ];
-
-        // $clave_cifrada = password_hash($clave, PASSWORD_DEFAULT, $options);
-
-        // return $clave_cifrada;
-
-
-        $secret_key = "IBwallet"; // Secret key for HMAC
-
-        $clave_cifrada = hash_hmac('sha256', $clave, $secret_key);
-        return $clave_cifrada;
     }
 }
