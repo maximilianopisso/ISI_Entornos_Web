@@ -1,46 +1,49 @@
 <?php
 require_once './php/classes/database.php';
 require_once './php/classes/usuario.php';
+require_once './php/classes/cuenta.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $email = (isset($_POST['email']) && is_string($_POST['email'])) ? trim($_POST['email']) : '';
   $password = (isset($_POST['password']) && is_string($_POST['password'])) ? trim($_POST['password']) : '';
-}
-try {
-  if (!is_string($email) || !is_string($password)) {
-    throw new Exception(" Error en login.php", 201);
+
+  try {
+    if (!is_string($email) || !is_string($password)) {
+      throw new Exception(" Error en login.php", 201);
+    }
+    $database = new Database();
+    $resultado = $database->getUsuarioByEmail($email);
+    if (!$resultado) {
+      throw new Exception("Usuario no existe", 202);
+    } else {
+      $user2 = $resultado;
+      $user = $user2[0];
+      $usuario = new Usuario(
+        $user["user_id"],
+        $user["user_nombre"],
+        $user["user_apellido"],
+        $user["user_email"],
+        $user["user_password"],
+        $user["user_contacto"],
+        $user["user_sexo"],
+        $user["user_intentos"],
+        $user["user_habilitado"],
+      );
+    }
+    $validacion = $usuario->validarUsuario($email, $password);
+    $cuentas = $usuario->obtenerCuentas();
+  } catch (Exception $e) {
+    echo "<br>";
+    echo "<br>";
+    echo "<br>";
+    echo "<br>";
+    echo "<br>";
+    $error = $e->getMessage();
+    echo $error;
+    $pos = strpos($error, "C:", true);
+    $shortError = substr($error, 0, $pos - 4);
+    echo '<script>alert("Codigo Error ' . $e->getCode() . ': ' . $shortError  .  '");</script>';
   }
-  $database = new Database();
-  $resultado = $database->getUsuarioByEmail($email);
-  if (!$resultado) {
-    throw new Exception("Usuario no existe", 202);
-  } else {
-    $user2 = $resultado;
-    $user = $user2[0];
-    $usuario = new Usuario(
-      $user["user_id"],
-      $user["user_nombre"],
-      $user["user_apellido"],
-      $user["user_email"],
-      $user["user_password"],
-      $user["user_contacto"],
-      $user["user_sexo"],
-      $user["user_intentos"],
-      $user["user_habilitado"],
-    );
-  }
-  $validacion = $usuario->validarUsuario($email, $password);
-} catch (Exception $e) {
-  echo "<br>";
-  echo "<br>";
-  echo "<br>";
-  echo "<br>";
-  echo "<br>";
-  $error = $e->getMessage();
-  echo $error;
-  $pos = strpos($error, "C:", true);
-  $shortError = substr($error, 0, $pos - 4);
-  echo '<script>alert("Codigo Error ' . $e->getCode() . ': ' . $shortError  .  '");</script>';
 }
 ?>
 
@@ -86,7 +89,7 @@ try {
 
 <body id="">
 
-  <!-- header -->
+  <!-- header  -->
   <header class=" fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container-fluid nav-container">
@@ -142,7 +145,7 @@ try {
           Utils::mostrarUsuarios($resultado);
           echo '<br><p style="font-weight:700">RESULTADO VALIDACION USER:</p>';
           if (isset($validacion) && $validacion) {
-            Utils::screenMsj('<p style="color:green; font-weight:700">Credenciales válido</p>');
+            Utils::screenMsj('<p style="color:green; font-weight:700">Credenciales válido. Reinicia Intentos -> Intentos restantes: ' . $usuario->getNroIntentos() . '</p>');
           } else {
             Utils::screenMsj('<p style="color:red; font-weight:700">Credenciales inválido. Intentos restantes: ' . $usuario->getNroIntentos() . '</p>');
             // echo '<script>alert("Credenciales Invalidas");</script>';
@@ -154,8 +157,8 @@ try {
           <hr>
           <br>
           <?php
-          $cuentas = $usuario->obtenerCuentas();
-          if (isset($validacion) && ($validacion || count($cuentas) === 0)) {
+
+          if (isset($validacion) && ($validacion || count($cuentas) === 0 || count($cuentasGet) === 0)) {
             echo '<table class="table table-hover text-center">';
             echo '<thead>';
             echo '<tr>';
@@ -179,9 +182,9 @@ try {
               echo '<td scope="col">' . $cuenta["cue_alias"] . '</th>';
               echo '<td scope="col">' . $cuenta["cue_tipo_moneda"] . '</th>';
               if ($cuenta["cue_tipo_moneda"] === "PESO") {
-                echo '<td scope="col"> $ ' . $cuenta["cue_saldo"] . '</th>';
+                echo '<td scope="col"> $ ' . number_format($cuenta["cue_saldo"], 2) . '</th>';
               } else {
-                echo '<td scope="col"> USD ' . $cuenta["cue_saldo"] . '</th>';
+                echo '<td scope="col"> U$S ' . number_format($cuenta["cue_saldo"], 2) . '</th>';
               }
               echo '</tr>';
             }
@@ -196,18 +199,28 @@ try {
     </div>
     <br>
     <br>
+    <h3> Operaciones </h3>
+    <hr>
     <?php
     if (isset($validacion) && $validacion && count($cuentas) !== 0) {
-      echo '<h3> Operaciones </h3>';
-      echo '<hr>';
-      echo '<div class="align-items-center py-4 mb-5">';
-      echo '<form id="operaciones" class="d-flex justify-content-center">';
-      echo '<button id="transferencias" type="submit" class="btn btn-primary mx-3"><a href="transferencias.html" style="color: white; text-decoration: none;">Transferencias</a></button>';
-      echo '<button id="movimientos" type="submit" class="btn btn-success mx-3"><a href="movimientos.html" style="color: white; text-decoration: none;">Ver Movimientos</a></button>';
+      echo '<div class="py-4 mb-5 d-flex" style = "padding: 0px auto;">';
+      echo '<form action="transferencias.php" method="get">';
+      echo '<input type="hidden" name="user_id" value="' . $usuario->getId() . '">';
+      echo '<button id="movimientos" type="submit" class="btn btn-primary mx-3" disabled >Transferir</button>';
       echo '</form>';
+
+      echo '<form action="movimientos.php" method="get" >';
+      echo '<input type="hidden" name="user_id" value="' . $usuario->getId() . '">';
+      echo '<button id="movimientos" type="submit" class="btn btn-success mx-3">Ver movimientos</button>';
+      echo '</form>';
+      echo ' </div>';
+    } else {
+      echo '<div class="align-items-center py-4 mb-5">';
+      echo '<p style="color:red; font-weight:700">No puede realizar operaciones</p>';
       echo ' </div>';
     }
     ?>
+
   </section>
 </body>
 

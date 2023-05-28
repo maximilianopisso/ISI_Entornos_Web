@@ -42,12 +42,10 @@ class Database
             if (!$sentencia->execute()) {
                 throw new Exception($this->conexion->error, 102);
             }
-
             $resultado = $sentencia->get_result();
             $filasAfectadas = $sentencia->affected_rows;
             $data = $resultado->fetch_all(MYSQLI_ASSOC);
             $sentencia->close();
-
             return array($data, $filasAfectadas);
         } catch (Exception $e) {
             throw new Exception($e, $e->getCode());
@@ -116,6 +114,41 @@ class Database
         $query = "SELECT * FROM usuarios WHERE user_email = ?";
         try {
             $resultado = $this->executeSelectQuery($query, [$email]);
+            if ($resultado[1] !== 0) {
+                return $resultado[0];
+            } else {
+                return false;
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $this->closeDatabase();
+        }
+    }
+
+    public function getUsuarioById($user_id)
+    {
+        $query = "SELECT * FROM usuarios WHERE user_id = ?";
+        try {
+            $resultado = $this->executeSelectQuery($query, [$user_id]);
+            if ($resultado[1] !== 0) {
+                return $resultado[0];
+            } else {
+                return false;
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $this->closeDatabase();
+        }
+    }
+    public function getCuentabyNroCuenta($nroCuenta)
+    {
+        $query = "SELECT * FROM cuentas WHERE cue_nro_cuenta = ?";
+        try {
+            $resultado = $this->executeSelectQuery($query, [$nroCuenta]);
             if ($resultado[1] !== 0) {
                 return $resultado[0];
             } else {

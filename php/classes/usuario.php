@@ -33,6 +33,11 @@ class Usuario
         return $this->nombre;
     }
 
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getApellido()
     {
         return $this->apellido;
@@ -217,25 +222,22 @@ class Usuario
         }
     }
 
-
-
-    public function obtenerMovimientos()
+    public function obtenerCuenta($nroCuenta)
     {
-    }
-
-    public function agregarMovimiento($tipo, $monto)
-    {
-        $movimiento = [
-            "tipo" => $tipo,
-            "monto" => $monto,
-            "fecha" => date("Y-m-d H:i:s")
-        ];
-    }
-
-    public function visualizarMovimientos()
-    {
-        // // foreach ($this->movimientos as $movimiento) {
-        //     echo "Tipo: " . $movimiento['tipo'] . ", Monto: " . $movimiento['monto'] . ", Fecha: " . $movimiento['fecha'] . "<br>";
-        // }
+        try {
+            $query = "SELECT * FROM cuentas WHERE cue_user_id = ? AND cue_nro_cuenta = ?";
+            $database = new Database();
+            $resultado = $database->executeSelectQuery($query, [$this->id, $nroCuenta]);
+            if ($resultado[1] !== 0) {
+                return $resultado[0];
+            } else {
+                return false;
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $database->closeDatabase();
+        }
     }
 }

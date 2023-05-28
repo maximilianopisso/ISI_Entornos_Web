@@ -9,8 +9,7 @@
   <!-- Meta Tags -->
   <meta name="description" content=" Este es el login de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
        y transferencias de dinero se hagan a través de Internet." />
-  <meta name="keywords"
-    content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
+  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
 
   <!-- Opengraph -->
   <meta property="og:title" content="Transferencias | IBWallet | Tu Billetera Digital" />
@@ -26,8 +25,7 @@
   <!-- Para importar iconos redes sociales -->
 
   <!-- Boostrap -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
-    integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
   <!-- CSS -->
   <link rel="stylesheet" href="./css/style.css">
@@ -44,8 +42,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container-fluid nav-container">
         <a class="navbar-brand" href="#">IBWallet</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-          aria-controls="navbarNav" aria-expanded="false" aria-label="Menu Principal">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Menu Principal">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
@@ -80,7 +77,7 @@
         <select class="form-control" style="width: 500px;" name="cuentas" id="cuentaOrigen">
           <option selected>Seleccionar...</option>
           <option value="">CA-$-00754654654645454</option>
-          <option value="">CA-USD-0078884223625555</option>
+          <option value="">CA-U$S-0078884223625555</option>
           <option value="">CC-$-0073884555545454</option>
         </select>
         <br>
@@ -89,17 +86,15 @@
         <select class="form-control" style="width: 500px;" name="cuentas" id="cuentaDestino">
           <option selected>Seleccionar...</option>
           <option value="">CA-$-00754654654645454</option>
-          <option value="">CA-USD-0078884223625555</option>
+          <option value="">CA-U$S-0078884223625555</option>
           <option value="">CC-$-0073884555545454</option>
         </select>
         <br>
         <label for="importe" style="font-weight: 600;">Importe:</label>
         <input type="" class="form-control" id="importe" style="width: 500px;">
         <br>
-        <button id="btn-transferir" type="submit" href="" class="btn btn-primary"
-          style="width:150px;">Transferir</button>
-        <button id="btn-volver" type="submit" class="btn btn-danger" style="width:150px;"><a href="home.php"
-            style="color: white; text-decoration: none; width: 200px;">Volver</a></button>
+        <button id="btn-transferir" type="submit" href="" class="btn btn-primary" style="width:150px;">Transferir</button>
+        <button id="btn-volver" type="submit" class="btn btn-danger" style="width:150px;"><a href="home.php" style="color: white; text-decoration: none; width: 200px;">Volver</a></button>
       </form>
   </section>
 </body>

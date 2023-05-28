@@ -58,4 +58,8 @@ class Utils
             Utils::screenMsj("saldos: " . $cuenta["cue_saldo"]);
         }
     }
+    public static function alert($msj)
+    {
+        echo '<script>alert("' . $msj . '");</script>';
+    }
 }
