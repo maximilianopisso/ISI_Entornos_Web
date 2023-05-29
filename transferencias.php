@@ -1,3 +1,46 @@
+<?php
+require_once "./php/classes/database.php";
+require_once "./php/classes/usuario.php";
+require_once "./php/classes/cuenta.php";
+require_once "./php/classes/movimiento.php";
+require_once "./php/classes/utils.php";
+//MOVIMIENTOS !!!
+
+if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+  $user_id = (isset($_GET['user_id']) && is_string($_GET['user_id'])) ? trim($_GET['user_id']) : '';
+  // Utils::alert($nroCuenta);
+  $database = new Database();
+  $resultadoGet = $database->getUsuarioById($user_id);
+  if (!$resultadoGet[0]) {
+    throw new Exception("Usuario no existe", 202);
+  } else {
+    $userAuxGet = $resultadoGet[0];
+
+    $usuario = new Usuario(
+      $resultadoGet[0]["user_id"],
+      $resultadoGet[0]["user_nombre"],
+      $resultadoGet[0]["user_apellido"],
+      $resultadoGet[0]["user_email"],
+      $resultadoGet[0]["user_password"],
+      $resultadoGet[0]["user_contacto"],
+      $resultadoGet[0]["user_sexo"],
+      $resultadoGet[0]["user_intentos"],
+      $resultadoGet[0]["user_habilitado"],
+    );
+  }
+  // $validacionGet = $usuarioGet->validarUsuario($email, $password);
+  $resultadoGet = $usuario->obtenerCuentas();
+  // var_dump($resultadoGet);
+  // echo "<br>";
+  // echo "<br>";
+  // var_dump($resultadoGet[0]);
+  if (!$resultadoGet) {
+    throw new Exception("Cuenta no existe", 202);
+  } else {
+    $cuentaGet = $resultadoGet;
+  }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -70,32 +113,47 @@
     </nav>
     <h3>Transferencias</h3>
     <hr>
-    <div id="transferencias" class="col-12 pt-4">
-      <form action="">
-        <label for="origen" style="font-weight: 600;">Cuenta origen:</label>
-        <br>
-        <select class="form-control" style="width: 500px;" name="cuentas" id="cuentaOrigen">
-          <option selected>Seleccionar...</option>
-          <option value="">CA-$-00754654654645454</option>
-          <option value="">CA-U$S-0078884223625555</option>
-          <option value="">CC-$-0073884555545454</option>
-        </select>
-        <br>
-        <label for="destino" style="font-weight: 600;">Cuenta destino:</label>
-        <br>
-        <select class="form-control" style="width: 500px;" name="cuentas" id="cuentaDestino">
-          <option selected>Seleccionar...</option>
-          <option value="">CA-$-00754654654645454</option>
-          <option value="">CA-U$S-0078884223625555</option>
-          <option value="">CC-$-0073884555545454</option>
-        </select>
-        <br>
-        <label for="importe" style="font-weight: 600;">Importe:</label>
-        <input type="" class="form-control" id="importe" style="width: 500px;">
-        <br>
-        <button id="btn-transferir" type="submit" href="" class="btn btn-primary" style="width:150px;">Transferir</button>
-        <button id="btn-volver" type="submit" class="btn btn-danger" style="width:150px;"><a href="home.php" style="color: white; text-decoration: none; width: 200px;">Volver</a></button>
-      </form>
+    <br>
+    <?php
+    if (isset($cuentaGet) && count($cuentaGet) !== 0) {
+      echo '<div id="transferencias" class="col-12 pt-2">';
+      echo '<form action="transferencias.php" method="post">';
+      echo '<label for="origen" style="font-weight: 600;">Cuenta origen:</label>';
+      echo '<br>';
+      echo '<select class="form-control" style="width: 500px;" name="cuentaOrigen">';
+      echo '<option value="seleccionar" selected>Seleccionar...</option>';
+      foreach ($cuentaGet as $cuenta) {
+        $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
+        echo '<option value="' . $cuenta[" cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
+      }
+      echo '</select>';
+      echo '<br>';
+      echo '<label for="origen" style="font-weight: 600;">Cuenta Destino:</label>';
+      echo '<br>';
+      echo '<select class="form-control" style="width: 500px;" name="cuentaDestino">';
+      echo '<option value="seleccionar" selected>Seleccionar...</option>';
+      foreach ($cuentaGet as $cuenta) {
+        $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
+        echo '<option value="' . $cuenta[" cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
+      }
+      echo '</select>';
+      echo '<br>';
+      echo '<label for="importe" style="font-weight: 600;">Importe:</label>';
+      echo '<input type="" name ="importe" class="form-control" id="importe" style="width: 500px;">';
+      echo '<br>';
+      echo '<button id="btn-transferir" type="submit" class="btn btn-primary" style="width:150px;">Transferir</button>';
+      echo '</form>';
+      echo '<br>';
+    }
+
+    echo '<br>';
+    echo '<form method="">';
+    echo '<button type="submit" formaction="home.php" class="btn btn-danger" style="width:150px;">Volver</button>';
+    echo '</form>';
+    echo ' <br> ';
+    echo '</div>'
+
+    ?>
   </section>
 </body>
 

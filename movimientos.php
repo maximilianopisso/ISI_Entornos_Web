@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo '<label for="" style="font-weight: 600;">Seleccioná tu cuenta:</label>';
       echo '<br>';
       echo '<select class="form-control" style="width: 500px;" name="selectCuenta">';
-      echo '<option selected>Seleccionar...</option>';
+      echo '<option value="selected" selected>Seleccionar...</option>';
       foreach ($cuentaGet as $cuenta) {
         $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
@@ -147,6 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo '<br>';
       echo '<button id="verMovimientos" type="submit" class="btn btn-primary" style="width:150px;">Ver</button>';
       echo '</form>';
+      echo '</div>';
     } else {
       // echo '<p style="color:blue; font-weight:700">No posee cuentas</p>';
     }
@@ -200,7 +201,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo '</div>';
     echo '<br>';
     echo '<form method="">';
-    echo '<button type="submit" formaction="home.php" class="btn btn-danger">Volver</button>';
+    echo '<button type="submit" formaction="home.php" class="btn btn-danger" style="width:150px;">Volver</button>';
     echo '</form>';
     echo ' <br> ';
     ?>

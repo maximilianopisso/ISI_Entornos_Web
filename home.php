@@ -206,7 +206,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo '<div class="py-4 mb-5 d-flex" style = "padding: 0px auto;">';
       echo '<form action="transferencias.php" method="get">';
       echo '<input type="hidden" name="user_id" value="' . $usuario->getId() . '">';
-      echo '<button id="movimientos" type="submit" class="btn btn-primary mx-3" disabled >Transferir</button>';
+      echo '<button id="movimientos" type="submit" class="btn btn-primary mx-3" >Transferir</button>';
       echo '</form>';
 
       echo '<form action="movimientos.php" method="get" >';
