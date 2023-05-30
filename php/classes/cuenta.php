@@ -1,5 +1,7 @@
 <?php
 require_once 'database.php';
+require_once 'movimiento.php';
+require_once 'utils.php';
 class Cuenta
 {
     private $id;
@@ -24,6 +26,11 @@ class Cuenta
     }
 
     //GETTERS
+    public function getId()
+    {
+        return $this->id;
+    }
+
     public function getNroCuenta()
     {
         return $this->nroCuenta;
@@ -60,15 +67,15 @@ class Cuenta
         return $this->nroCbu;
     }
 
+    public function getAlias()
+    {
+        return $this->alias;
+    }
     public function setNroCbu($nroCbu)
     {
         $this->nroCbu = $nroCbu;
     }
 
-    public function getAlias()
-    {
-        return $this->alias;
-    }
 
     public function setAlias($alias)
     {
@@ -124,46 +131,54 @@ class Cuenta
         }
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    public function transferir(Cuenta $cuentaDestino, $importe)
+    public function transferirImporte(Cuenta $cuentaDestino, $importe)
     {
-        // Verifica si las cuentas tienen el mismo tipo de moneda
-        if ($this->tipoMoneda !== $cuentaDestino->getTipoMoneda()) {
-            throw new Exception("Las cuentas no tienen la misma moneda.");
+        try {
+            // Verifica si las cuentas tienen el mismo tipo de moneda
+            if ($this->tipoMoneda !== $cuentaDestino->getTipoMoneda()) {
+                throw new Exception("Las cuentas no tienen la misma moneda.");
+            }
+
+            // Verifica si la cuenta origen tiene suficiente saldo
+            if ($this->saldo < $importe) {
+                throw new Exception("Saldo insuficiente en la cuenta origen.");
+            }
+
+            // Restar el importe de la cuenta origen
+            $this->saldo -= $importe;
+            $cuentaDestino->sumarSaldo($importe);
+            $updateCuentaOrigen = $this->actualizarSaldo();
+            if (!$updateCuentaOrigen) {
+                Utils::alert("update saldo cuenta origen ");
+            } else {
+                Utils::alert("Error en el update cuenta origen ");
+            }
+            $updateCuentaDestino = $cuentaDestino->actualizarSaldo();
+            if (!$updateCuentaDestino) {
+                Utils::alert("update saldo cuenta destino ");
+            } else {
+                Utils::alert("Error en el update cuenta destino ");
+            }
+
+
+            // Registrar el movimiento en ambas cuentas
+            //Registro mov cuenta origen
+            $regMovOrigen = $this->registrarMovimiento($cuentaDestino->getId(), "Transferencia de dinero", $importe);
+            if (!$regMovOrigen) {
+                Utils::alert("Se registra movimiento para la cuenta origen");
+            } else {
+                Utils::alert("Error registro movimiento cuenta origen");
+            }
+            //Regitro mov cuenta destino
+            $regMovDetino = $cuentaDestino->registrarMovimiento($this->id, "Ingreso de dinero", $importe);
+            if (!$regMovDetino) {
+                Utils::alert("Se registra movimiento para la cuenta destino");
+            } else {
+                Utils::alert("Error registro movimiento cuenta destino");
+            }
+        } catch (Exception $e) {
+            throw new Exception($e, 1);
         }
-
-        // Verifica si la cuenta origen tiene suficiente saldo
-        if ($this->saldo < $importe) {
-            throw new Exception("Saldo insuficiente en la cuenta origen.");
-        }
-
-        // Restar el importe de la cuenta origen
-        $this->saldo -= $importe;
-
-        // Sumar el importe a la cuenta destino
-        $cuentaDestino->sumarSaldo($importe);
-
-        // Registrar el movimiento en ambas cuentas
-        $this->registrarMovimiento(-$importe, "Transferencia a cuenta {$cuentaDestino->getNroCuenta()}");
-        $cuentaDestino->registrarMovimiento($importe, "Transferencia desde cuenta {$this->getNroCuenta()}");
     }
 
     private function sumarSaldo($importe)
@@ -171,28 +186,37 @@ class Cuenta
         $this->saldo += $importe;
     }
 
-    private function registrarMovimiento($importe, $descripcion)
+    private function registrarMovimiento($idDestino, $descripcion, $importe)
     {
-        $movimiento = new Movimiento($this->nroCuenta, $descripcion, $importe, $this->saldo);
-        $movimiento->guardar(); // Aquí se invoca un método para guardar el movimiento en la base de datos o realizar otras acciones necesarias.
+        try {
+            $movimiento = new Movimiento($this->id, $idDestino, $descripcion, $importe, $this->saldo);
+            $resultado = $movimiento->registrarMovimiento();
+            if (!$resultado) {
+                return $resultado;
+            } else {
+                throw new Exception("No se pudo registrar el movimiento", 1);
+            }
+        } catch (Exception $e) {
+            throw $e;
+        }
     }
 
-
-    public function agregarMovimiento($tipo, $monto)
+    public function actualizarSaldo()
     {
-        $movimiento = [
-            "tipo" => $tipo,
-            "monto" => $monto,
-            "fecha" => date("Y-m-d H:i:s")
-        ];
+        try {
+            $query = "UPDATE cuentas SET cue_saldo = ? WHERE cue_id = ?";
+            $database = new Database();
+            $resultado = $database->executeUpdateQuery($query, [$this->saldo, $this->id]);
+            if ($resultado[1] !== 0) {
+                return $resultado[0];
+            } else {
+                return false;
+            };
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        } finally {
+            // Cerrar la conexión a la base de datos
+            $database->closeDatabase();
+        }
     }
-
-
-    public function visualizarMovimientos()
-    {
-        // // foreach ($this->movimientos as $movimiento) {
-        //     echo "Tipo: " . $movimiento['tipo'] . ", Monto: " . $movimiento['monto'] . ", Fecha: " . $movimiento['fecha'] . "<br>";
-        // }
-    }
-    // ...
 }

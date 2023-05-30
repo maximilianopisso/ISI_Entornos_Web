@@ -57,7 +57,6 @@ class Database
     public function executeUpdateQuery($query, $params = [])
     {
         $filasAfectadas = 0;
-        $data = [];
 
         try {
             $sentencia = $this->conexion->prepare($query);
@@ -87,6 +86,36 @@ class Database
         }
     }
 
+    public function executeInsertQuery($query, $params = [])
+    {
+        $filasAfectadas = 0;
+
+        try {
+            $sentencia = $this->conexion->prepare($query);
+
+            if (!$sentencia) {
+                throw new Exception($this->conexion->error, 101);
+            }
+            // En caso de tener parametros, se preparan los tipos de parametros
+            if (!empty($params)) {
+                $tipoDatos = $this->getTypeData($params);
+                $sentencia->bind_param($tipoDatos, ...$params);
+            }
+            // Ejecuta la sentencia SQL
+            if (!$sentencia->execute()) {
+                throw new Exception($this->conexion->error, 102);
+            }
+
+            $resultado = $sentencia->get_result();
+            $filasAfectadas = $sentencia->affected_rows;
+            $sentencia->close();
+
+            return array($resultado, $filasAfectadas);
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        }
+    }
+
     private function getTypeData($params)
     {
         $types = '';
@@ -107,6 +136,20 @@ class Database
     public function closeDatabase()
     {
         $this->conexion->close();
+    }
+
+    public function openConection()
+    {
+        try {
+            $this->conexion = new mysqli($this->host, $this->username, $this->password, $this->database);
+            $this->conexion->set_charset('utf8mb4');
+
+            if ($this->conexion->connect_error) {
+                throw new Exception($this->conexion->connect_error, 100);
+            }
+        } catch (Exception $e) {
+            throw new Exception($e, $e->getCode());
+        }
     }
 
     public function getUsuarioByEmail($email)
