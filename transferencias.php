@@ -152,7 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 700px;">
   <!-- header -->
-  <!-- <header class="fixed-top">
+  <header class="fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
       <div class="container-fluid nav-container">
         <a class="navbar-brand" href="#">IBWallet</a>
@@ -168,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
       </div>
     </nav>
-  </header> -->
+  </header>
 
   <!-- movimientos -->
   <section id="section-transf" class="container">
