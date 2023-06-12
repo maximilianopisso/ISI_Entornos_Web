@@ -1,3 +1,70 @@
+<?php
+require_once './php/classes/database.php';
+require_once './php/classes/usuario.php';
+
+if ($_POST !== array()) {
+  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = (isset($_POST['email']) && is_string($_POST['email'])) ? trim($_POST['email']) : '';
+    $password = (isset($_POST['password']) && is_string($_POST['password'])) ? trim($_POST['password']) : '';
+
+    try {
+      //validaciones campos PHP
+      if (!is_string($email) || !is_string($password)) {
+        throw new Exception(" Error en login.php", 201);
+      }
+      $database = new Database();
+      $resultado = $database->getUsuarioByEmail($email);
+      //Validacion Resultado Busqueda en BD para el usuario
+      if (!$resultado) {
+        $msjError = "El email ingresado no se encuentra registrado";
+      } else {
+        $user2 = $resultado;
+        $user = $user2[0];
+        $usuario = new Usuario(
+          $user["user_id"],
+          $user["user_nombre"],
+          $user["user_apellido"],
+          $user["user_email"],
+          $user["user_password"],
+          $user["user_contacto"],
+          $user["user_sexo"],
+          $user["user_intentos"],
+          $user["user_habilitado"],
+        );
+
+        $validacion = $usuario->validarUsuario($email, $password);
+
+        if ($validacion[0] === false) {
+          $msjError = $validacion[1];
+        } else {
+          // Inicia session PHP
+          session_start();
+
+          // Guardar datos importantes en el session
+          $_SESSION['user'] = array(
+            'id' => $usuario->getId(),
+            'nombre' => $usuario->getNombre(),
+            'apellido' => $usuario->getApellido(),
+            'sexo' => $usuario->getSexo(),
+          );
+
+          // Redirigir al usuario a home.php
+          header('Location: home.php', true, 302);
+          exit();
+        }
+      }
+    } catch (Exception $e) {
+      $codeError = $e->getCode();
+      $error = $e->getMessage();
+      $pos = strpos($error, "C:", true);
+      $shortError = substr($error, 0, $pos - 4);
+      Utils::alert('Codigo Error: ' . $codeError . ' - ' . $shortError);
+    }
+  }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -31,15 +98,6 @@
   <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
-  <!-- JQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
-
-  <!-- JScript -->
-  <!-- <script src="./js/classes/usuario.js" defer></script> -->
-  <!-- <script src="./js/classes/movimiento.js" defer></script> -->
-  <script src="./js/driverLocalStore.js" defer></script>
-  <script src="./js/login.js" defer></script>
-
 </head>
 
 <body>
@@ -72,34 +130,32 @@
     realizar un logeo con usurio y contraseña para acceder a los servicios">
       <h1 style="text-align: center; margin: 0px" class="py-2">Ingresar a IBWallet</h1>
     </div>
+
+    <!-- Formulario Login -->
     <div class="col-12 justify-content-center" style="margin: 10px auto;">
-      <!-- <div class="col-lg-12 col-md-12 col-sm-12 justify-content-center"> -->
-
-      <!-- FORMULARIO LOGIN -->
-      <form id="formularioLogin" class="width: 100%" action="home.php" method="post">
-        <!-- <form id="formularioLogin" class="width: 100%" action=""> -->
-
+      <form id="formularioLogin" class="width: 100%" action="login.php" method="post">
         <div class="col-lg-8 col-md-8 col-sm-12" style="margin: 0px auto ;">
           <label for="inputEmail" class="form-label">Email</label>
-          <input type="text" class="form-control" name="email">
+          <input type="text" class="form-control" name="email" id="email">
         </div>
 
         <div class="col-lg-8 col-md-8 col-sm-12" style="margin: 0px auto ;">
           <label for="inputPassword" class="form-label">Password</label>
-          <input type="text" class="form-control" name="password">
+          <input type="password" class="form-control" name="password" id="password">
         </div>
 
-        <div class="col-12 mensaje-container">
-          <span id="msjerror"></span>
+        <div class="col-12 mensaje-container" id="msjError" style="max-height: 50x; height: 50px;">
+          <?php
+          if (isset($msjError)) {
+            echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
+          }
+          ?>
         </div>
 
         <div class="col-12 d-flex justify-content-center" id="boton-conteiner">
           <button id="boton" type="submit" class="btn btn-primary" style="background-color: #8842c1; width: 150px ; font-weight: 600;">Ingresar</button>
         </div>
       </form>
-
-
-    </div>
     </div>
   </section>
 
@@ -135,6 +191,10 @@
   <script>
     AOS.init();
   </script>
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- JScript -->
+  <script src="./js/login.js"></script>
 </body>
 
 </html>

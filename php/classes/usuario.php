@@ -165,17 +165,9 @@ class Usuario
     {
         //
         try {
-            //Validacion Intentos
-            if ($this->nroIntentos === 0) {
-                if ($this->habilitado === 1) {
-                    $this->inhabilitarUsuario();
-                }
-                throw new Exception("Usuario superó intentos. Usuario inhabilidado", 200);
-            }
-
             //Validacion Inhabilitado
             if ($this->habilitado !== 1) {
-                throw new Exception("El usuario se encuentra inhabilitado", 201);
+                return array(false, 'El usuario se encuentra BLOQUEADO');
             }
 
             // Encripta clave ingresada por formulario.
@@ -184,12 +176,16 @@ class Usuario
             // Verificar la clave ingresada con la versión cifrada almacenada en la base de datos
             if ($claveCifrada === $this->password && $this->email === $email) {
                 $this->resetNroIntentos();
-                return true;
+                return array(true, "Usuario Validado");
             } else {
                 if ($this->email === $email) {
                     $this->restarNroIntentos();
+                    if ($this->nroIntentos === 0) {
+                        $this->inhabilitarUsuario();
+                        return array(false, 'La contraseña es incorrecta. El usuario fue BLOQUEADO');
+                    }
                 }
-                return false;
+                return array(false, 'La contraseña es incorrecta. Nro Intentos: ' . $this->nroIntentos);
             }
         } catch (Exception $e) {
             throw new Exception($e, $e->getCode());
