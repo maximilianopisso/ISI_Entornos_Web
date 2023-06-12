@@ -4,7 +4,6 @@ require_once './php/classes/usuario.php';
 require_once './php/classes/cuenta.php';
 
 $resultado = session_start();
-
 if ($resultado === true) {
   $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '(no seteado)');
   $user_nombre = (isset($_SESSION['user']['nombre']) ? $_SESSION['user']['nombre'] : '(no seteado)');
@@ -25,20 +24,18 @@ if ($resultado === true) {
     $database = new Database();
     $resultado = $database->getUsuarioById($user_id);
     if (!$resultado) {
-      throw new Exception("Usuario no existe", 202);
+      throw new Exception("No se ha podido recuperar los datos del usuario", 202);
     } else {
-      $user2 = $resultado;
-      $user = $user2[0];
       $usuario = new Usuario(
-        $user["user_id"],
-        $user["user_nombre"],
-        $user["user_apellido"],
-        $user["user_email"],
-        $user["user_password"],
-        $user["user_contacto"],
-        $user["user_sexo"],
-        $user["user_intentos"],
-        $user["user_habilitado"],
+        $resultado[0]["user_id"],
+        $resultado[0]["user_nombre"],
+        $resultado[0]["user_apellido"],
+        $resultado[0]["user_email"],
+        $resultado[0]["user_password"],
+        $resultado[0]["user_contacto"],
+        $resultado[0]["user_sexo"],
+        $resultado[0]["user_intentos"],
+        $resultado[0]["user_habilitado"]
       );
     }
     $cuentas = $usuario->obtenerCuentas();

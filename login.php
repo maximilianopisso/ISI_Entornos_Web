@@ -35,6 +35,7 @@ if ($_POST !== array()) {
         $validacion = $usuario->validarUsuario($email, $password);
 
         if ($validacion[0] === false) {
+          //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS
           $msjError = $validacion[1];
         } else {
           // Inicia session PHP
@@ -144,7 +145,7 @@ if ($_POST !== array()) {
           <input type="password" class="form-control" name="password" id="password">
         </div>
 
-        <div class="col-12 mensaje-container" id="msjError" style="max-height: 50x; height: 50px;">
+        <div class="col-12 mensaje-container" id="msjError" style="margin: 1vh 0px; max-height: 50x; height: 50px;">
           <?php
           if (isset($msjError)) {
             echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';

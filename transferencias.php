@@ -5,75 +5,68 @@ require_once "./php/classes/cuenta.php";
 require_once "./php/classes/movimiento.php";
 require_once "./php/classes/utils.php";
 
-if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+$resultado = session_start();
+if ($resultado === true) {
+  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '(no seteado)');
+
+  // Obtenermos el usuario
   try {
-    $user_id = (isset($_GET['user_id']) && is_string($_GET['user_id'])) ? trim($_GET['user_id']) : '';
-    $database = new Database();
-    $resultadoGet = $database->getUsuarioById($user_id);
-    if (!$resultadoGet[0]) {
-      throw new Exception("Usuario no existe", 202);
+    $databaseUser = new Database();
+    $resultado = $databaseUser->getUsuarioById($user_id);
+    if (!$resultado) {
+      throw new Exception("No se ha podido recuperar los datos del usuario", 202);
     } else {
       $usuario = new Usuario(
-        $resultadoGet[0]["user_id"],
-        $resultadoGet[0]["user_nombre"],
-        $resultadoGet[0]["user_apellido"],
-        $resultadoGet[0]["user_email"],
-        $resultadoGet[0]["user_password"],
-        $resultadoGet[0]["user_contacto"],
-        $resultadoGet[0]["user_sexo"],
-        $resultadoGet[0]["user_intentos"],
-        $resultadoGet[0]["user_habilitado"],
+        $resultado[0]["user_id"],
+        $resultado[0]["user_nombre"],
+        $resultado[0]["user_apellido"],
+        $resultado[0]["user_email"],
+        $resultado[0]["user_password"],
+        $resultado[0]["user_contacto"],
+        $resultado[0]["user_sexo"],
+        $resultado[0]["user_intentos"],
+        $resultado[0]["user_habilitado"]
       );
     }
-    // $validacionGet = $usuarioGet->validarUsuario($email, $password);
-    $resultadoGet = $usuario->obtenerCuentas();
-    if (!$resultadoGet) {
-      throw new Exception("Cuenta no existe", 202);
-    } else {
-      $cuentaGet = $resultadoGet;
-    }
+    $cuentasUsuario = $usuario->obtenerCuentas();
   } catch (Exception $e) {
-    Utils::alert($e);
+    $codeError = $e->getCode();
+    $error = $e->getMessage();
+    $pos = strpos($error, "C:", true);
+    $shortError = substr($error, 0, $pos - 4);
+    Utils::alert("Codigo Error ' . $codeError . ': ' . $shortError  .  '");
   }
+} else {
+  Utils::alert("Error al cargar la sesion del usuario logueado");
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   try {
-    // $cuentaOrigen = (isset($_POST['cuentaOrigen']) && is_string($_POST['cuentaOrigen'])) ? trim($_POST['cuentaOrigen']) : '';
-    // $cuentaDestino = (isset($_POST['$cuentaDestino']) && is_string($_POST['$cuentaDestino'])) ? trim($_POST['$cuentaDestino']) : '';
-    // $importe = (isset($_POST['$importe']) && is_string($_POST['$importe'])) ? $_POST['$importe'] : '';
-    $NroCuentaOrigen = $_POST['cuentaOrigen'];
-    $NroCuentaDestino = $_POST['cuentaDestino'];
-    $importe = $_POST['importe'];
+    $NroCuentaOrigen = (isset($_POST['cuentaOrigen']) && is_string($_POST['cuentaOrigen'])) ? trim($_POST['cuentaOrigen']) : 'seleccionar';
+    $NroCuentaDestino = (isset($_POST['cuentaDestino']) && is_string($_POST['cuentaDestino'])) ? trim($_POST['cuentaDestino']) : 'seleccionar';
+    $importe = (isset($_POST['importe']) && is_string($_POST['importe'])) ? $_POST['importe'] : '';
 
-    // Ahora puedes utilizar los valores capturados para realizar las acciones necesarias, como realizar la transferencia o procesar la información.
-
-    // Ejemplo de cómo imprimir los valores capturados:
-    // echo "Cuenta origen: " . $NroCuentaOrigen . "<br>";
-    // echo "Cuenta destino: " . $NroCuentaDestino . "<br>";
-    // echo "Importe: " . $importe . "<br>";
-    // var_dump($NroCuentaOrigen, $NroCuentaDestino, $importe);
-    // $NroCuentaOrigen = floatval($NroCuentaOrigen);
-    // $NroCuentaDestino = floatval($NroCuentaDestino);
+    if ($NroCuentaOrigen === "selecionar" || $NroCuentaDestino === "seleccionar") {
+      throw new Exception("Alguna de las cuentas no fue seleccionada", 301);
+    }
 
     if ($NroCuentaOrigen === $NroCuentaDestino) {
-      throw new Exception("Las cuentas tienen que ser distintas", 300);
+      throw new Exception("Las cuentas tienen que ser distintas", 302);
     }
 
+    //HACER UN JAVASCRIPT PARA EL IMPORTE !!
     if (is_numeric($importe)) {
       $importe = floatval($importe);
+      $importe = round($importe, 2);
     } else {
-      throw new Exception("El importe no es valido", 300);
+      throw new Exception("El importe no es valido", 303);
     }
 
-    if (!is_string($NroCuentaOrigen) || !is_string($NroCuentaDestino) || !is_float($importe)) {
-      throw new Exception("Los valores introducidos no son validos", 300);
-    };
+    $databaseCuentaOrigen = new Database();
+    $datosCuentaOrigen = $databaseCuentaOrigen->getCuentabyNroCuenta($NroCuentaOrigen);
 
-    $database = new Database();
-    $datosCuentaOrigen = $database->getCuentabyNroCuenta($NroCuentaOrigen);
-    $database->openConection();
-    $datosCuentaDestino = $database->getCuentabyNroCuenta($NroCuentaDestino);
+    $databaseCuentaDestino = new Database();
+    $datosCuentaDestino = $databaseCuentaDestino->getCuentabyNroCuenta($NroCuentaDestino);
 
     $cuentaOrigen = new Cuenta(
       $datosCuentaOrigen[0]["cue_id"],
@@ -85,6 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $datosCuentaOrigen[0]["cue_alias"],
       $datosCuentaOrigen[0]["cue_saldo"],
     );
+
     $cuentaDestino = new Cuenta(
       $datosCuentaDestino[0]["cue_id"],
       $datosCuentaDestino[0]["cue_user_id"],
@@ -95,20 +89,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       $datosCuentaDestino[0]["cue_alias"],
       $datosCuentaDestino[0]["cue_saldo"],
     );
-    // var_dump($cuentaOrigen);
-    // echo "<br>";
-    // echo "<br>";
-    // var_dump($cuentaDestino);
-
 
     if ($cuentaOrigen->getTipoMoneda() !== $cuentaDestino->getTipoMoneda()) {
-      throw new Exception("Las cuentas deben tener el mismo tipo de moneda", 300);
+      throw new Exception("Las cuentas deben tener la misma moneda", 300);
     } else {
       $cuentaOrigen->transferirImporte($cuentaDestino, $importe);
     }
   } catch (Exception $e) {
-    Utils::screenMsj($e);
-    Utils::alert($e->getMessage());
+    $msjError = $e->getMessage();
   }
 }
 ?>
@@ -186,27 +174,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr>
     <br>
     <?php
-    if (isset($cuentaGet) && count($cuentaGet) !== 0) {
+    if ($cuentasUsuario !== false && count($cuentasUsuario) !== 0) {
       echo '<div id="transferencias" class="col-12 pt-2">';
-      echo '<form action="transferencias.php" method="post">';
+      echo '<form id="formTransferencias" action="transferencias.php" method="post">';
       echo '<label for="origen" style="font-weight: 600;">Cuenta origen:</label><br>';
-      echo '<select class="form-control" style="width: 500px;" name="cuentaOrigen">';
+      echo '<select class="form-control" style="width: 500px;" name="cuentaOrigen" id="cuentaOrigen">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
-      foreach ($cuentaGet as $cuenta) {
+      foreach ($cuentasUsuario as $cuenta) {
         $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
       }
       echo '</select><br>';
       echo '<label for="origen" style="font-weight: 600;">Cuenta Destino:</label><br>';
-      echo '<select class="form-control" style="width: 500px;" name="cuentaDestino">';
+      echo '<select class="form-control" style="width: 500px;" name="cuentaDestino" id="cuentaDestino">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
-      foreach ($cuentaGet as $cuenta) {
+      foreach ($cuentasUsuario as $cuenta) {
         $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
       }
       echo '</select><br>';
       echo '<label for="importe" style="font-weight: 600;">Importe:</label>';
-      echo '<input type="text" name="importe" class="form-control" id="importe" style="width: 500px;"><br>';
+      echo '<input type="text" name="importe" id="importe" class="form-control" style="width: 500px;">';
+      echo '<div class="col-12 mensaje-container" id="msjError" style="margin: 1vh 0px; max-height: 50x; height: 50px;">';
+      if (isset($msjError)) {
+        echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
+      }
+      echo '</div>';
       echo '<button id="btn-transferir" type="submit" class="btn btn-primary" style="width:150px;">Transferir</button>';
       echo '</form>';
     }
@@ -220,6 +213,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     ?>
   </section>
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <!-- JScript -->
+  <script src="./js/transferencias.js"></script>
 </body>
 
 </html>
