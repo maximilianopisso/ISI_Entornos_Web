@@ -1,30 +1,24 @@
 <?php
-require_once './php/classes/database.php';
-require_once './php/classes/usuario.php';
-require_once './php/classes/cuenta.php';
+require_once './app/classes/database.php';
+require_once './app/classes/usuario.php';
+require_once './app/classes/cuenta.php';
 
 $resultado = session_start();
 if ($resultado === true) {
-  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '(no seteado)');
-  $user_nombre = (isset($_SESSION['user']['nombre']) ? $_SESSION['user']['nombre'] : '(no seteado)');
-  $user_apellido = (isset($_SESSION['user']['apellido']) ? $_SESSION['user']['apellido'] : '(no seteado)');
-  $user_sexo = (isset($_SESSION['user']['sexo']) ? $_SESSION['user']['sexo'] : '(no seteado)');
-
-  // echo '<br>' . '<br>' . '<br>' . '<br>';
-  // echo '<h2>Sesión</h2><br>';
-  // echo 'session_start = ' . ($resultado ? 'true' : 'false') . '<br>';
-  // echo 'session_name = ' . session_name() . '<br>';
-  // echo 'session_id = ' . session_id() . '<br>';
-  // echo 'ID :' . $user_id . '<br>';
-  // echo 'NOMBRE :' . $user_nombre . '<br>';
-  // echo 'APELLIDO :' . $user_apellido . '<br>';
-  // echo 'SEXO :' . $user_sexo . '<br>';
+  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '');
+  $user_nombre = (isset($_SESSION['user']['nombre']) ? $_SESSION['user']['nombre'] : '');
+  $user_apellido = (isset($_SESSION['user']['apellido']) ? $_SESSION['user']['apellido'] : '');
+  $user_sexo = (isset($_SESSION['user']['sexo']) ? $_SESSION['user']['sexo'] : '');
 
   try {
+    if (empty($user_id) || empty($user_nombre) || empty($user_apellido) || empty($user_sexo)) {
+      throw new Exception("No se pudieron obtener los datos de la session");
+    }
+
     $database = new Database();
     $resultado = $database->getUsuarioById($user_id);
     if (!$resultado) {
-      throw new Exception("No se ha podido recuperar los datos del usuario", 202);
+      throw new Exception("No se ha podido recuperar los datos del usuario");
     } else {
       $usuario = new Usuario(
         $resultado[0]["user_id"],
@@ -40,11 +34,14 @@ if ($resultado === true) {
     }
     $cuentas = $usuario->obtenerCuentas();
   } catch (Exception $e) {
-    $codeError = $e->getCode();
     $error = $e->getMessage();
-    $pos = strpos($error, "C:", true);
-    $shortError = substr($error, 0, $pos - 4);
-    Utils::alert("Codigo Error ' . $codeError . ': ' . $shortError  .  '");
+    $codeError = $e->getCode();
+    Utils::alert('Error: ' . $codeError);
+    if ($codeError = 400) {
+      header("Location: denegado.html");  // PANTALLA DE ACCESO DENEGADO
+    } else {
+      Utils::alert('Error: ' . $error);
+    }
   }
 } else {
   Utils::alert("Error al cargar la sesion del usuario logueado");
@@ -82,7 +79,7 @@ if ($resultado === true) {
 
 </head>
 
-<body id="">
+<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px;">
   <!-- header -->
   <header class=" fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -94,7 +91,7 @@ if ($resultado === true) {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="./login.php">Cerrar Sesion</a>
+              <a class="nav-link" href="./login.php?logout">Cerrar Sesión</a>
             </li>
           </ul>
         </div>
@@ -109,8 +106,6 @@ if ($resultado === true) {
     <br>
     <br>
     <?php
-    // $sexo = $usuario->getSexo();
-    // $bienvenida = "";
     switch ($user_sexo) {
       case 'M':
         $bienvenida = 'Bienvenido: ';
@@ -193,8 +188,11 @@ if ($resultado === true) {
       echo ' </div>';
     }
     ?>
-
   </section>
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+
 </body>
 
 </html>

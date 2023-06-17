@@ -15,107 +15,16 @@ class Database
             $this->conexion->set_charset('utf8mb4');
 
             if ($this->conexion->connect_error) {
-                throw new Exception($this->conexion->connect_error, 100);
+                throw new Exception($this->conexion->connect_error);
             }
         } catch (Exception $e) {
             throw new Exception($e, $e->getCode());
         }
     }
 
-    public function executeSelectQuery($query, $params = [])
-    {
-        $filasAfectadas = 0;
-        $data = [];
-
-        try {
-            $sentencia = $this->conexion->prepare($query);
-
-            if (!$sentencia) {
-                throw new Exception($this->conexion->error, 101);
-            }
-            // En caso de tener parametros, se preparan los tipos de parametros
-            if (!empty($params)) {
-                $tipoDatos = $this->getTypeData($params);
-                $sentencia->bind_param($tipoDatos, ...$params);
-            }
-            // Ejecuta la sentencia SQL
-            if (!$sentencia->execute()) {
-                throw new Exception($this->conexion->error, 102);
-            }
-            $resultado = $sentencia->get_result();
-            $filasAfectadas = $sentencia->affected_rows;
-            $data = $resultado->fetch_all(MYSQLI_ASSOC);
-            $sentencia->close();
-            return array($data, $filasAfectadas);
-        } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-            // echo "Error al ejecutar la consulta: " . $sentencia->error;
-            // return false;
-        }
-    }
-
-    public function executeUpdateQuery($query, $params = [])
-    {
-        $filasAfectadas = 0;
-
-        try {
-            $sentencia = $this->conexion->prepare($query);
-
-            if (!$sentencia) {
-                throw new Exception($this->conexion->error, 101);
-            }
-            // En caso de tener parametros, se preparan los tipos de parametros
-            if (!empty($params)) {
-                $tipoDatos = $this->getTypeData($params);
-                $sentencia->bind_param($tipoDatos, ...$params);
-            }
-            // Ejecuta la sentencia SQL
-            if (!$sentencia->execute()) {
-                throw new Exception($this->conexion->error, 102);
-            }
-
-            $resultado = $sentencia->get_result();
-            $filasAfectadas = $sentencia->affected_rows;
-            $sentencia->close();
-
-            return array($resultado, $filasAfectadas);
-        } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-            // echo "Error al ejecutar la consulta: " . $sentencia->error;
-            // return false;
-        }
-    }
-
-    public function executeInsertQuery($query, $params = [])
-    {
-        $filasAfectadas = 0;
-
-        try {
-            $sentencia = $this->conexion->prepare($query);
-
-            if (!$sentencia) {
-                throw new Exception($this->conexion->error, 101);
-            }
-            // En caso de tener parametros, se preparan los tipos de parametros
-            if (!empty($params)) {
-                $tipoDatos = $this->getTypeData($params);
-                $sentencia->bind_param($tipoDatos, ...$params);
-            }
-            // Ejecuta la sentencia SQL
-            if (!$sentencia->execute()) {
-                throw new Exception($this->conexion->error, 102);
-            }
-
-            $resultado = $sentencia->get_result();
-            $filasAfectadas = $sentencia->affected_rows;
-            $sentencia->close();
-
-            return array($resultado, $filasAfectadas);
-        } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-        }
-    }
-
+    /**
+     * Método que devuelve el tipo de dato que se pasa por parametro.
+     */
     private function getTypeData($params)
     {
         $types = '';
@@ -133,22 +42,125 @@ class Database
         return $types;
     }
 
-    public function closeDatabase()
+    /***
+     * Método que ejecuta un SELECT de la query y sus parametros, que son enviados como argumentos.
+     */
+    public function executeSelectQuery($query, $params = [])
     {
-        $this->conexion->close();
+        $filasAfectadas = 0;
+        $data = [];
+
+        try {
+            $sentencia = $this->conexion->prepare($query);
+
+            if (!$sentencia) {
+                throw new Exception($this->conexion->error);
+            }
+
+            // En caso que la consulta contenga parametros, se preparan
+            if (!empty($params)) {
+                $tipoDatos = $this->getTypeData($params);
+                $sentencia->bind_param($tipoDatos, ...$params);
+            }
+
+            // Ejecuta la sentencia SQL
+            if (!$sentencia->execute()) {
+                throw new Exception($this->conexion->error);
+            }
+
+            // Obtengo resultados
+            $resultado = $sentencia->get_result();
+            $filasAfectadas = $sentencia->affected_rows;
+            $data = $resultado->fetch_all(MYSQLI_ASSOC);
+
+            // Cierro sentencia y conexion con BD
+            $sentencia->close();
+            $this->conexion->close();
+
+            //Se devuelve el resultado, y el numero de filas afectadas.
+            return array($data, $filasAfectadas);
+        } catch (Exception $e) {
+            throw new Exception("Falla al ejecutar la sentencia SELECT", $e->getCode());
+        }
     }
 
-    public function openConection()
+    /***
+     * Método que ejecuta un UPDATE de la query y sus parametros, que son enviados como argumentos.
+     */
+    public function executeUpdateQuery($query, $params = [])
     {
-        try {
-            $this->conexion = new mysqli($this->host, $this->username, $this->password, $this->database);
-            $this->conexion->set_charset('utf8mb4');
+        $filasAfectadas = 0;
 
-            if ($this->conexion->connect_error) {
-                throw new Exception($this->conexion->connect_error, 100);
+        try {
+            $sentencia = $this->conexion->prepare($query);
+
+            if (!$sentencia) {
+                throw new Exception($this->conexion->error);
             }
+
+            // En caso que la consulta contenga parametros, se preparan
+            if (!empty($params)) {
+                $tipoDatos = $this->getTypeData($params);
+                $sentencia->bind_param($tipoDatos, ...$params);
+            }
+
+            // Ejecuta la sentencia SQL
+            if (!$sentencia->execute()) {
+                throw new Exception($this->conexion->error);
+            }
+
+            // Obtengo resultados 
+            $resultado = $sentencia->get_result();
+            $filasAfectadas = $sentencia->affected_rows;
+
+            // Cierro sentencia y conecxion con BD
+            $sentencia->close();
+            $this->conexion->close();
+
+            //Se devuelve el resultado, y el numero de filas afectadas.
+            return array($resultado, $filasAfectadas);
         } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
+            throw new Exception("Falla al ejecutar la sentencia UPDATE", $e->getCode());
+        }
+    }
+
+    /***
+     * Método que ejecuta un INSERT de la query y sus parametros, que son enviados como argumentos.
+     */
+    public function executeInsertQuery($query, $params = [])
+    {
+        $filasAfectadas = 0;
+
+        try {
+            $sentencia = $this->conexion->prepare($query);
+
+            if (!$sentencia) {
+                throw new Exception($this->conexion->error);
+            }
+
+            // En caso que la consulta contenga parametros, se preparan
+            if (!empty($params)) {
+                $tipoDatos = $this->getTypeData($params);
+                $sentencia->bind_param($tipoDatos, ...$params);
+            }
+
+            // Ejecuta la sentencia SQL
+            if (!$sentencia->execute()) {
+                throw new Exception($this->conexion->error);
+            }
+
+            // Obtengo resultados
+            $resultado = $sentencia->get_result();
+            $filasAfectadas = $sentencia->affected_rows;
+
+            // Cierro sentencia y conecxion con BD
+            $sentencia->close();
+            $this->conexion->close();
+
+            //Se devuelve el resultado, y el numero de filas afectadas.
+            return array($resultado, $filasAfectadas);
+        } catch (Exception $e) {
+            throw new Exception("Falla al ejecutar la sentencia INSERT", $e->getCode());
         }
     }
 
@@ -163,10 +175,7 @@ class Database
                 return false;
             };
         } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-        } finally {
-            // Cerrar la conexión a la base de datos
-            $this->closeDatabase();
+            throw new Exception("Falla al obtener usuario por email conocido", $e->getCode());
         }
     }
 
@@ -181,10 +190,7 @@ class Database
                 return false;
             };
         } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-        } finally {
-            // Cerrar la conexión a la base de datos
-            $this->closeDatabase();
+            throw new Exception("Falla al obtener usuario por id conocido", $e->getCode());
         }
     }
     public function getCuentabyNroCuenta($nroCuenta)
@@ -198,10 +204,7 @@ class Database
                 return false;
             };
         } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-        } finally {
-            // Cerrar la conexión a la base de datos
-            $this->closeDatabase();
+            throw new Exception("Falla al obtener cuenta por numero de cuenta conocido", $e->getCode());
         }
     }
 
@@ -216,10 +219,7 @@ class Database
                 return false;
             };
         } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
-        } finally {
-            // Cerrar la conexión a la base de datos
-            $this->closeDatabase();
+            throw new Exception("Falla al verificar existencia de usuario por email conocido", $e->getCode());
         }
     }
 }

@@ -1,20 +1,21 @@
 <?php
-require_once "./php/classes/database.php";
-require_once "./php/classes/usuario.php";
-require_once "./php/classes/cuenta.php";
-require_once "./php/classes/movimiento.php";
-require_once "./php/classes/utils.php";
+require_once "./app/classes/database.php";
+require_once "./app/classes/usuario.php";
+require_once "./app/classes/cuenta.php";
+require_once "./app/classes/movimiento.php";
+require_once "./app/classes/utils.php";
 
-$resultado = session_start();
-if ($resultado === true) {
-  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '(no seteado)');
-
+if (session_start()) {
   // Obtenermos el usuario
+  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '');
   try {
+    if (empty($user_id)) {
+      throw new Exception("No se pudieron obtener los datos de la sesión", 400);
+    }
     $databaseUser = new Database();
     $resultado = $databaseUser->getUsuarioById($user_id);
     if (!$resultado) {
-      throw new Exception("No se ha podido recuperar los datos del usuario", 202);
+      throw new Exception("No se ha podido recuperar los datos del usuario");
     } else {
       $usuario = new Usuario(
         $resultado[0]["user_id"],
@@ -30,11 +31,14 @@ if ($resultado === true) {
     }
     $cuentasUsuario = $usuario->obtenerCuentas();
   } catch (Exception $e) {
-    $codeError = $e->getCode();
     $error = $e->getMessage();
-    $pos = strpos($error, "C:", true);
-    $shortError = substr($error, 0, $pos - 4);
-    Utils::alert("Codigo Error ' . $codeError . ': ' . $shortError  .  '");
+    $codeError = $e->getCode();
+    Utils::alert('Error: ' . $codeError);
+    if ($codeError = 400) {
+      header("Location: denegado.html");  // PANTALLA DE ACCESO DENEGADO
+    } else {
+      Utils::alert('Error: ' . $error);
+    }
   }
 } else {
   Utils::alert("Error al cargar la sesion del usuario logueado");
@@ -100,14 +104,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
   <!-- CSS -->
   <link rel="stylesheet" href="./css/style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-  <!-- JQuery -->
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js" defer></script>
+  <!-- REVISAR  -->
+  <link rel="stylesheet" href="./css/styles2.css">
 
 </head>
 
-<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 700px;">
+<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px !important;">
 
   <!-- header -->
   <header class="fixed-top">
@@ -120,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="./login.php">Cerrar Sesion</a>
+              <a class="nav-link" href="./login.php?logout">Cerrar Sesión</a>
             </li>
           </ul>
         </div>
@@ -156,6 +158,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo '<div class="col-8 mensaje-container" id="msjError" style="margin: 1vh 0px;max-height: 50x; height: 50px;">';
       if (isset($msjError)) {
         echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
+        echo '<script>
+              setTimeout(function() {
+                  document.getElementById("alerta").style.display = "none";
+              }, 4000);
+          </script>';
       }
       echo '</div>';
       echo '<button id="verMovimientos" type="submit" class="btn btn-primary" style="width:150px;">Ver</button>';
@@ -172,7 +179,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <br>
     <?php
     if (isset($cuentaSeleccionada)) {
-      //Si existen movimientos en la cuenta seleccionada, los muestro.
+      // Si existen movimientos en la cuenta seleccionada, los muestro.
       if ($movimientosCuenta !== false && count($movimientosCuenta) !== 0) {
         echo '<table class="table table-hover text-center">';
         echo '<thead id="headTablaMovimientos">';
@@ -222,6 +229,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo ' <br> ';
     ?>
   </section>
+
+  <!-- Bootstrap -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
+
 </body>
 
 </html>

@@ -1,6 +1,6 @@
 <?php
-require_once './php/classes/database.php';
-require_once './php/classes/usuario.php';
+require_once './app/classes/database.php';
+require_once './app/classes/usuario.php';
 
 if ($_POST !== array()) {
   if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -8,15 +8,16 @@ if ($_POST !== array()) {
     $password = (isset($_POST['password']) && is_string($_POST['password'])) ? trim($_POST['password']) : '';
 
     try {
-      //validaciones campos PHP
-      if (!is_string($email) || !is_string($password)) {
-        throw new Exception(" Error en login.php", 201);
+      //Validaciones campos formularios login
+      if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8 || strlen($password) > 15) {
+        throw new Exception("Los campos ingresados email o password son incorrectos");
       }
+
       $database = new Database();
-      $resultado = $database->getUsuarioByEmail($email);
       //Validacion Resultado Busqueda en BD para el usuario
+      $resultado = $database->getUsuarioByEmail($email);
       if (!$resultado) {
-        $msjError = "El email ingresado no se encuentra registrado";
+        $msjError = "El usuario no se encuentra registrado";
       } else {
         $user2 = $resultado;
         $user = $user2[0];
@@ -34,14 +35,11 @@ if ($_POST !== array()) {
 
         $validacion = $usuario->validarUsuario($email, $password);
 
-        if ($validacion[0] === false) {
-          //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS   //USAR LOS TROWS
-          $msjError = $validacion[1];
-        } else {
-          // Inicia session PHP
+        if ($validacion === true) {
+          //Inicia nueva session en PHP
           session_start();
 
-          // Guardar datos importantes en el session
+          // Guarda los datos del usuario en la session PHP
           $_SESSION['user'] = array(
             'id' => $usuario->getId(),
             'nombre' => $usuario->getNombre(),
@@ -49,21 +47,24 @@ if ($_POST !== array()) {
             'sexo' => $usuario->getSexo(),
           );
 
-          // Redirigir al usuario a home.php
+          // Redirige a la home del usuario
           header('Location: home.php', true, 302);
           exit();
         }
       }
     } catch (Exception $e) {
-      $codeError = $e->getCode();
-      $error = $e->getMessage();
-      $pos = strpos($error, "C:", true);
-      $shortError = substr($error, 0, $pos - 4);
-      Utils::alert('Codigo Error: ' . $codeError . ' - ' . $shortError);
+      $msjError = $e->getMessage();
     }
   }
 }
 
+// Para destruir el session de PHP
+if (isset($_GET['logout'])) {
+  if (session_start()) {
+    session_destroy();
+  }
+  header("Location: login.php");
+}
 ?>
 
 <!DOCTYPE html>
@@ -95,13 +96,10 @@ if ($_POST !== array()) {
   <link rel="stylesheet" href="./css/style.css">
   <!-- REVISAR  -->
   <link rel="stylesheet" href="./css/styles2.css">
-  <!-- FIN REVISAR  -->
-  <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 </head>
 
-<body>
+<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px;">
   <!-- header-->
   <header class="fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -147,8 +145,13 @@ if ($_POST !== array()) {
 
         <div class="col-12 mensaje-container" id="msjError" style="margin: 1vh 0px; max-height: 50x; height: 50px;">
           <?php
-          if (isset($msjError)) {
+          if (isset($msjError) && !empty($msjError)) {
             echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
+            echo '<script>
+              setTimeout(function() {
+                  document.getElementById("alerta").style.display = "none";
+              }, 4000);
+          </script>';
           }
           ?>
         </div>
@@ -160,38 +163,9 @@ if ($_POST !== array()) {
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer id="contactos">
-    <div class="row conteiner-fluid contactos-container">
-      <div class="col-sm-12 col-md-6 col-lg-6 redessociales-container">
-        <p class="titulos">Nuestras Redes</p>
-        <a class="fa fa-facebook" href="https:\\facebook.com"></a>
-        <a class="fa fa-twitter" href="https:\\twitter.com"></a>
-        <a class="fa fa-instagram" href="https:\\instagram.com"></a>
-      </div>
-      <div class="col-sm-12 col-md-6 col-lg-6  contactos-container">
-        <p class="titulos">Escribinos</p>
-        <address>
-          <p>contacto@ibwallet.com.ar</p>
-        </address>
-      </div>
-    </div>
-    <p class="leyenda">Copyright © 2021 IBWallet S.A. Todos los derechos reservados</p>
-    <div class="certificaciones">
-      <p>
-        <a href="https://jigsaw.w3.org/css-validator/check/referer">
-          <img style="border:0;width:88px;height:31px" src="https://jigsaw.w3.org/css-validator/images/vcss" alt="¡CSS Válido!" />
-        </a>
-      </p>
-    </div>
-  </footer>
-
+  <!-- Bootstrap -->
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-  <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-  <script>
-    AOS.init();
-  </script>
   <!-- JQuery -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <!-- JScript -->

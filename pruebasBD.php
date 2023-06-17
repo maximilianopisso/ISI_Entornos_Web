@@ -1,20 +1,20 @@
  <?php
 
-    // require_once "./php/classes/database.php";
-    // require_once "./php/classes/usuario.php";
-    // require_once "./php/classes/cuenta.php";
-    // require_once "./php/classes/movimiento.php";
-    // require_once "./php/classes/utils.php";
+    // require_once "./app/classes/database.php";
+    // require_once "./app/classes/usuario.php";
+    // require_once "./app/classes/cuenta.php";
+    // require_once "./app/classes/movimiento.php";
+    // require_once "./app/classes/utils.php";
 
     // $database = new Database();
     // $filasAfectada = 0;
     // $resultado = $database->getUsuarioByEmail("%a");
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $clave = (isset($_POST['clave']) && is_string($_POST['clave'])) ? trim($_POST['clave']) : '';
+        $password = (isset($_POST['clave']) && is_string($_POST['clave'])) ? trim($_POST['clave']) : '';
 
         $secret_key = "IBwallet"; // Secret key for HMAC
-        $claveCifrada = hash_hmac('sha256', $clave, $secret_key);
+        $passwordCifrada = hash_hmac('sha256', $password, $secret_key);
     }
 
     ?>
@@ -52,7 +52,7 @@
 
  </head>
 
- <body>
+ <body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px;">
 
      <!-- header 
     <header class="fixed-top">
@@ -101,9 +101,9 @@
             echo '<button id="btn-transferir" type="submit" class="btn btn-primary" style="width:150px;">Cifrar Clave</button>';
             echo '<br>';
             echo '</form>';
-            if (isset($claveCifrada) && $clave !== "") {
+            if (isset($passwordCifrada) && $password !== "") {
                 echo '<br>';
-                echo '<input type="text" class="form-control" style="width: 700px;"name="claveCifrada" id="claveCifrada" value=' . $claveCifrada  . '>';
+                echo '<input type="text" class="form-control" style="width: 700px;"name="claveCifrada" id="claveCifrada" value=' . $passwordCifrada  . '>';
             }
 
             // var_dump($resultado);
@@ -125,9 +125,9 @@
 
             // foreach ($resultado as $elemento) {
             //     // Iterar sobre los campos del elemento
-            //     foreach ($elemento as $clave => $valor) {
+            //     foreach ($elemento as $password => $valor) {
             //         // Verificar si el campo comienza con "user_"
-            //         if (strpos($clave, 'user_') === 0) {
+            //         if (strpos($password, 'user_') === 0) {
             //             echo "$valor <br>";
             //         }
             //     }
@@ -143,18 +143,10 @@
             // }
             // echo "FILAS: " . $filasAfectada . "<br>";
             ?>
-
-
-
      </section>
 
      <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.10.2/dist/umd/popper.min.js" integrity="sha384-7+zCNj/IqJ95wo16oMtfsKbZ9ccEh31eOz1HGyDuCQ6wgnyJNSYdrPa03rtR1zdB" crossorigin="anonymous"></script>
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.min.js" integrity="sha384-QJHtvGhmr9XOIpI6YVutG+2QOK9T+ZnN4kzFN1RtK3zEFEIsxhlmWl5/YESvpZ13" crossorigin="anonymous"></script>
-
-     <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
-     <script>
-         AOS.init();
-     </script>
 
  </body>
 
