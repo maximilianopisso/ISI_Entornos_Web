@@ -117,7 +117,7 @@ if ($resultado === true) {
         $bienvenide = 'Bienvenide: ';
         break;
     }
-    echo '<p style="color: #87698d; font-size: 1em; text-align: right;" id="msjBienvenida">' . $bienvenida . $user_nombre . ',' . $user_apellido . '</p>';
+    echo '<p style="color: #87698d; font-size: 1.2em; text-align: right;" id="msjBienvenida">' . $bienvenida . $user_nombre . ',' . $user_apellido . '</p>';
     ?>
     <br>
     <div id="cuentas" class="row align-items-start ">

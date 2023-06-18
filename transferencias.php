@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo '<select class="form-control" style="width: 500px;" name="cuentaOrigen" id="cuentaOrigen">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
       foreach ($cuentasUsuario as $cuenta) {
-        $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
+        $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' .  $cuenta["cue_nro_cuenta"] . ' [' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$ ' : 'U$S ') . $cuenta["cue_saldo"] . ']';
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
       }
       echo '</select><br>';
@@ -208,7 +208,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<script>
               setTimeout(function() {
                   document.getElementById("alerta").style.display = "none";
-              }, 4000);
+                  window.location.href = window.location.href;
+              }, 1500);
           </script>';
       }
       echo '</div>';
