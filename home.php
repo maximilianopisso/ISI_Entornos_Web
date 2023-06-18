@@ -38,7 +38,7 @@ if ($resultado === true) {
     $codeError = $e->getCode();
     Utils::alert('Error: ' . $codeError);
     if ($codeError = 400) {
-      header("Location: denegado.html");  // PANTALLA DE ACCESO DENEGADO
+      header("Location: error.html");
     } else {
       Utils::alert('Error: ' . $error);
     }
@@ -172,19 +172,19 @@ if ($resultado === true) {
     <?php
     if ($cuentas) {
       echo '<div class="py-4 mb-5 d-flex" style = "padding: 0px auto;">';
-      echo '<form action="transferencias.php" method="get">';
-      echo '<input type="hidden" name="user_id" value="' . $usuario->getId() . '">';
-      echo '<button id="movimientos" type="submit" class="btn btn-primary mx-3" >Transferir</button>';
+      echo '<form action="transferencias.php">';
+      echo '<button type="submit" id="transferir"  class="btn btn-primary mx-3" style="width:200px;font-weight:600;height:50px;">Transferir</button>';
       echo '</form>';
-
-      echo '<form action="movimientos.php" method="get" >';
-      echo '<input type="hidden" name="user_id" value="' . $usuario->getId() . '">';
-      echo '<button id="movimientos" type="submit" class="btn btn-success mx-3">Ver movimientos</button>';
+      echo '<form action="movimientos.php">';
+      echo '<button type="submit" id="verMovimientos"  class="btn btn-success mx-3" style="width:200px;font-weight:600;height:50px;">Ver movimientos</button>';
       echo '</form>';
+      // echo '<form action="login.php?logout" >';
+      // echo '<button type="submit" id="verMovimientos" value="logout" class="btn btn-danger mx-3" style="width:200px;font-weight:600;height:50px;">Volver</button>';
+      // echo '</form>';
       echo ' </div>';
     } else {
       echo '<div class="align-items-center py-4 mb-5">';
-      echo '<p style="color:red; font-weight:700">No puede realizar operaciones</p>';
+      echo '<p style="color:red; font-weight:700">No tiene cuentas para poder </p>';
       echo ' </div>';
     }
     ?>

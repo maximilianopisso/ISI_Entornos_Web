@@ -42,8 +42,10 @@ class Movimiento
             $database = new Database();
             $query = "INSERT INTO movimientos (`mov_id`, `mov_cuenta_origen_id`, `mov_cuenta_destino_id`, `mov_fecha`, `mov_nro_transaccion`, `mov_descripcion`, `mov_importe`, `mov_saldo`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
             $resultado = $database->executeInsertQuery($query, [$this->idOrigen, $this->idDestino, $this->fecha, $this->nroTransaccion, $this->descripcion, $this->importe, $this->saldo]);
-            if (!$resultado[0]) {
-                return $resultado[0];
+            if ($resultado[1] !== 0) {
+                return true;
+            } else {
+                return false;
             }
         } catch (Exception $e) {
             throw new Exception("Falla al registrar movimiento de cuenta", $e->getCode());

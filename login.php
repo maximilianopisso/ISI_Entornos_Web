@@ -111,9 +111,6 @@ if (isset($_GET['logout'])) {
         <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
           <ul class="navbar-nav">
             <li class="nav-item">
-              <a class="nav-link" href="#contactos">Contacto</a>
-            </li>
-            <li class="nav-item">
               <a class="nav-link" href="./index.html">Inicio</a>
             </li>
           </ul>
@@ -124,21 +121,21 @@ if (isset($_GET['logout'])) {
 
   <!-- Login -->
   <section id="inicio" class="container" style="margin-top: 0px;">
-    <div class="row justify-content-center" styles="width: 200px">
-      <img id="icono" src="./images/login.svg" loading="lazy" style="width: 150px; align-items: center; display: block;" class="" alt="Imagen alusoria a la necesidad de 
+    <div class="row justify-content-center">
+      <img id="icono" src="./images/login.svg" style="width: 150px; align-items: center; display: block;" class="" alt="Imagen alusoria a la necesidad de 
     realizar un logeo con usurio y contraseña para acceder a los servicios">
       <h1 style="text-align: center; margin: 0px" class="py-2">Ingresar a IBWallet</h1>
     </div>
 
     <!-- Formulario Login -->
-    <div class="col-12 justify-content-center" style="margin: 10px auto;">
+    <div class="col-12 justify-content-center" style="margin: 10px auto; max-width:70%">
       <form id="formularioLogin" class="width: 100%" action="login.php" method="post">
-        <div class="col-lg-8 col-md-8 col-sm-12" style="margin: 0px auto ;">
+        <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 0px auto ;">
           <label for="inputEmail" class="form-label">Email</label>
           <input type="text" class="form-control" name="email" id="email">
         </div>
 
-        <div class="col-lg-8 col-md-8 col-sm-12" style="margin: 0px auto ;">
+        <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 0px auto;">
           <label for="inputPassword" class="form-label">Password</label>
           <input type="password" class="form-control" name="password" id="password">
         </div>
@@ -157,7 +154,7 @@ if (isset($_GET['logout'])) {
         </div>
 
         <div class="col-12 d-flex justify-content-center" id="boton-conteiner">
-          <button id="boton" type="submit" class="btn btn-primary" style="background-color: #8842c1; width: 150px ; font-weight: 600;">Ingresar</button>
+          <button id="boton" type="submit" class="btn btn-primary" style="background-color: #8842c1; width: 200px;height:50px; font-weight: 600;">Iniciar Sesión</button>
         </div>
       </form>
     </div>

@@ -36,7 +36,7 @@ if (session_start()) {
     $codeError = $e->getCode();
     Utils::alert('Error: ' . $codeError);
     if ($codeError = 400) {
-      header("Location: denegado.html");  // PANTALLA DE ACCESO DENEGADO
+      header("Location: error.html");
     } else {
       Utils::alert('Error: ' . $error);
     }
@@ -95,9 +95,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if ($cuentaOrigen->getTipoMoneda() !== $cuentaDestino->getTipoMoneda()) {
-      throw new Exception("Las cuentas deben tener la misma moneda", 300);
-    } else {
-      $cuentaOrigen->transferirImporte($cuentaDestino, $importe);
+      throw new Exception("Las cuentas deben tener la misma moneda");
+    }
+
+    $transaccion = $cuentaOrigen->transferirImporte($cuentaDestino, $importe);
+    if ($transaccion) {
+      $msjExito = "La transaccción se ha realizado con éxito";
     }
   } catch (Exception $e) {
     $msjError = $e->getMessage();
@@ -200,16 +203,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               }, 4000);
           </script>';
       }
+      if (isset($msjExito) && !empty($msjExito)) {
+        echo '<div id="alerta" class="alert alert-success role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjExito . '</div>';
+        echo '<script>
+              setTimeout(function() {
+                  document.getElementById("alerta").style.display = "none";
+              }, 4000);
+          </script>';
+      }
       echo '</div>';
-      echo '<button id="btn-transferir" type="submit" class="btn btn-primary" style="width:150px;">Transferir</button>';
+      echo '<button id="btn-transferir" type="submit" class="btn btn-primary" style="width:200px;font-weight:600;height:50px;">Transferir</button>';
       echo '</form>';
     }
-
     echo '<br>';
-    echo '<form method="">';
-    echo '<button type="submit" formaction="home.php" class="btn btn-danger" style="width:150px;">Volver</button>';
+    echo '<br>';
+    echo '<form action="home.php">';
+    echo '<button type="submit" class="btn btn-danger" style="width:200px;font-weight:600;height:50px;">Volver</button>';
     echo '</form>';
-    echo ' <br> ';
+    echo '<br>';
     echo '</div>'
 
     ?>

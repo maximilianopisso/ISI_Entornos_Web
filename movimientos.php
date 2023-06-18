@@ -35,7 +35,7 @@ if (session_start()) {
     $codeError = $e->getCode();
     Utils::alert('Error: ' . $codeError);
     if ($codeError = 400) {
-      header("Location: denegado.html");  // PANTALLA DE ACCESO DENEGADO
+      header("Location: error.html");
     } else {
       Utils::alert('Error: ' . $error);
     }
@@ -165,7 +165,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </script>';
       }
       echo '</div>';
-      echo '<button id="verMovimientos" type="submit" class="btn btn-primary" style="width:150px;">Ver</button>';
+      echo '<button id="verMovimientos" type="submit" class="btn btn-success" style= "width:200px;height:50px;font-weight:600;">Ver Movimientos</button>';
       echo '</form>';
       echo '</div>';
     } else {
@@ -223,8 +223,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     echo '</div>';
     echo '<br>';
-    echo '<form method="">';
-    echo '<button type="submit" formaction="home.php" class="btn btn-danger" style="width:150px;">Volver</button>';
+    echo '<form>';
+    echo '<button type="submit" formaction="home.php" class="btn btn-danger" style= "width:200px;height:50px;font-weight:600;">Volver</button>';
     echo '</form>';
     echo ' <br> ';
     ?>
