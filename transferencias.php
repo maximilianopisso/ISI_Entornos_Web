@@ -5,57 +5,54 @@ require_once "./app/classes/cuenta.php";
 require_once "./app/classes/movimiento.php";
 require_once "./app/classes/utils.php";
 
-if (session_start()) {
-  // Obtenermos el usuario
-  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '');
-
-  try {
-    if (empty($user_id)) {
-      throw new Exception("No se pudieron obtener los datos de la sesión", 400);
-    }
-    $databaseUser = new Database();
-    $resultado = $databaseUser->getUsuarioById($user_id);
-    if (!$resultado) {
-      throw new Exception("No se ha podido recuperar los datos del usuario");
-    } else {
-      $usuario = new Usuario(
-        $resultado[0]["user_id"],
-        $resultado[0]["user_nombre"],
-        $resultado[0]["user_apellido"],
-        $resultado[0]["user_email"],
-        $resultado[0]["user_password"],
-        $resultado[0]["user_contacto"],
-        $resultado[0]["user_sexo"],
-        $resultado[0]["user_intentos"],
-        $resultado[0]["user_habilitado"]
-      );
-    }
-    $cuentasUsuario = $usuario->obtenerCuentas();
-  } catch (Exception $e) {
-    $error = $e->getMessage();
-    $codeError = $e->getCode();
-    Utils::alert('Error: ' . $codeError);
-    if ($codeError = 400) {
-      header("Location: error.html");
-    } else {
-      Utils::alert('Error: ' . $error);
-    }
+// Comprobar si la sesión está iniciada
+try {
+  if (!session_start()) {
+    throw new Exception("Error al cargar la sesión del usuario logueado");
   }
-} else {
-  Utils::alert("Error al cargar la sesion del usuario logueado");
+
+  // Obtener datos de la session PHP 
+  $user_id = $_SESSION['user']['id'] ?? '';
+  if (empty($user_id)) {
+    throw new Exception("No se pudieron obtener los datos de la sesión");
+  }
+
+  // Obtener el usuario desde BD
+  $databaseUser = new Database();
+  $resultado = $databaseUser->getUsuarioById($user_id);
+
+  if (!$resultado) {
+    throw new Exception("No se ha podido recuperar los datos del usuario");
+  }
+
+  $usuario = new Usuario(
+    $resultado[0]["user_id"],
+    $resultado[0]["user_nombre"],
+    $resultado[0]["user_apellido"],
+    $resultado[0]["user_email"],
+    $resultado[0]["user_password"],
+    $resultado[0]["user_contacto"],
+    $resultado[0]["user_sexo"],
+    $resultado[0]["user_intentos"],
+    $resultado[0]["user_habilitado"]
+  );
+  // Obtener las cuentas del usuario
+  $cuentasUsuario = $usuario->obtenerCuentas();
+} catch (Exception $e) {
+  header("Location: error.html");
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   try {
-    $NroCuentaOrigen = (isset($_POST['cuentaOrigen']) && is_string($_POST['cuentaOrigen'])) ? trim($_POST['cuentaOrigen']) : 'seleccionar';
-    $NroCuentaDestino = (isset($_POST['cuentaDestino']) && is_string($_POST['cuentaDestino'])) ? trim($_POST['cuentaDestino']) : 'seleccionar';
+    $nroCuentaOrigen = (isset($_POST['cuentaOrigen']) && is_string($_POST['cuentaOrigen'])) ? trim($_POST['cuentaOrigen']) : 'seleccionar';
+    $nroCuentaDestino = (isset($_POST['cuentaDestino']) && is_string($_POST['cuentaDestino'])) ? trim($_POST['cuentaDestino']) : 'seleccionar';
     $importe = (isset($_POST['importe']) && is_string($_POST['importe'])) ? $_POST['importe'] : '';
 
-    if ($NroCuentaOrigen === "selecionar" || $NroCuentaDestino === "seleccionar") {
+    if ($nroCuentaOrigen === "selecionar" || $nroCuentaDestino === "seleccionar") {
       throw new Exception("Alguna de las cuentas no fue seleccionada");
     }
 
-    if ($NroCuentaOrigen === $NroCuentaDestino) {
+    if ($nroCuentaOrigen === $nroCuentaDestino) {
       throw new Exception("Las cuentas tienen que ser distintas");
     }
 
@@ -67,10 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $databaseCuentaOrigen = new Database();
-    $datosCuentaOrigen = $databaseCuentaOrigen->getCuentabyNroCuenta($NroCuentaOrigen);
+    $datosCuentaOrigen = $databaseCuentaOrigen->getCuentabyNroCuenta($nroCuentaOrigen);
 
     $databaseCuentaDestino = new Database();
-    $datosCuentaDestino = $databaseCuentaDestino->getCuentabyNroCuenta($NroCuentaDestino);
+    $datosCuentaDestino = $databaseCuentaDestino->getCuentabyNroCuenta($nroCuentaDestino);
 
     $cuentaOrigen = new Cuenta(
       $datosCuentaOrigen[0]["cue_id"],
@@ -97,7 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($cuentaOrigen->getTipoMoneda() !== $cuentaDestino->getTipoMoneda()) {
       throw new Exception("Las cuentas deben tener la misma moneda");
     }
-
+    $database = new Database();
+    $transaccion = $database->registrarTransaccion($cuentaOrigen, $cuentaDestino, $importe);
     $transaccion = $cuentaOrigen->transferirImporte($cuentaDestino, $importe);
     if ($transaccion) {
       $msjExito = "La transaccción se ha realizado con éxito";

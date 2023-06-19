@@ -36,6 +36,16 @@ class Cuenta
         return $this->tipoMoneda;
     }
 
+    public function getSaldo()
+    {
+        return $this->saldo;
+    }
+
+    public function sumarSaldo($importe)
+    {
+        $this->saldo += $importe;
+    }
+
     //METODOS
     public function getCuentabyNroCuenta($nroCuenta)
     {
@@ -85,10 +95,7 @@ class Cuenta
         }
     }
 
-    private function sumarSaldo($importe)
-    {
-        $this->saldo += $importe;
-    }
+
 
     private function registrarMovimiento($idDestino, $descripcion, $importe)
     {
@@ -105,8 +112,9 @@ class Cuenta
         }
     }
 
-    public function transferirImporte(Cuenta $cuentaDestino, $importe)
-    {
+    
+        public function transferirImporte(Cuenta $cuentaDestino, $importe
+        {
         try {
             // Verifica si las cuentas tienen el mismo tipo de moneda
             if ($this->tipoMoneda !== $cuentaDestino->getTipoMoneda()) {
@@ -128,6 +136,7 @@ class Cuenta
 
             // Suma el importe a la cuenta destino, transferido a desde la cuenta origen.
             $cuentaDestino->sumarSaldo($importe);
+
 
             // Actualiza saldo en BD de la cuenta origen.
             $updateCuentaOrigen = $this->actualizarSaldo();

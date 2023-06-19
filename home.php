@@ -3,51 +3,63 @@ require_once './app/classes/database.php';
 require_once './app/classes/usuario.php';
 require_once './app/classes/cuenta.php';
 
-$resultado = session_start();
-if ($resultado === true) {
-  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '');
-  $user_nombre = (isset($_SESSION['user']['nombre']) ? $_SESSION['user']['nombre'] : '');
-  $user_apellido = (isset($_SESSION['user']['apellido']) ? $_SESSION['user']['apellido'] : '');
-  $user_sexo = (isset($_SESSION['user']['sexo']) ? $_SESSION['user']['sexo'] : '');
-
-  try {
-    if (empty($user_id) || empty($user_nombre) || empty($user_apellido) || empty($user_sexo)) {
-      throw new Exception("No se pudieron obtener los datos de la session");
-    }
-
-    $database = new Database();
-    $resultado = $database->getUsuarioById($user_id);
-    if (!$resultado) {
-      throw new Exception("No se ha podido recuperar los datos del usuario");
-    } else {
-      $usuario = new Usuario(
-        $resultado[0]["user_id"],
-        $resultado[0]["user_nombre"],
-        $resultado[0]["user_apellido"],
-        $resultado[0]["user_email"],
-        $resultado[0]["user_password"],
-        $resultado[0]["user_contacto"],
-        $resultado[0]["user_sexo"],
-        $resultado[0]["user_intentos"],
-        $resultado[0]["user_habilitado"]
-      );
-    }
-    $cuentas = $usuario->obtenerCuentas();
-  } catch (Exception $e) {
-    $error = $e->getMessage();
-    $codeError = $e->getCode();
-    Utils::alert('Error: ' . $codeError);
-    if ($codeError = 400) {
-      header("Location: error.html");
-    } else {
-      Utils::alert('Error: ' . $error);
-    }
+try {
+  // Comprobar si la sesión está iniciada
+  if (!session_start()) {
+    throw new Exception("Error al cargar la sesión del usuario logueado");
   }
-} else {
-  Utils::alert("Error al cargar la sesion del usuario logueado");
-}
-?>
 
+  // Obtener el usuario desde BD
+  $user_id = $_SESSION['user']['id'] ?? '';
+  $user_nombre = $_SESSION['user']['nombre'] ?? '';
+  $user_apellido = $_SESSION['user']['apellido'] ?? '';
+  $user_sexo = $_SESSION['user']['sexo'] ?? '';
+
+  if (empty($user_id) || empty($user_nombre) || empty($user_apellido) || empty($user_sexo)) {
+    throw new Exception("No se pudieron obtener los datos de la sesión");
+  }
+
+  // Obtener el usuario y las cuentas
+  $databaseUser = new Database();
+  $resultado = $databaseUser->getUsuarioById($user_id);
+
+  if (!$resultado) {
+    throw new Exception("No se ha podido recuperar los datos del usuario");
+  }
+
+  $usuario = new Usuario(
+    $resultado[0]["user_id"],
+    $resultado[0]["user_nombre"],
+    $resultado[0]["user_apellido"],
+    $resultado[0]["user_email"],
+    $resultado[0]["user_password"],
+    $resultado[0]["user_contacto"],
+    $resultado[0]["user_sexo"],
+    $resultado[0]["user_intentos"],
+    $resultado[0]["user_habilitado"]
+  );
+
+  $cuentasUsuario = $usuario->obtenerCuentas();
+} catch (Exception $e) {
+  header("Location: error.html");
+}
+
+function habilitaTransferencia($cuentasUsuario)
+{
+  $monedaCuenta = [];
+  foreach ($cuentasUsuario as $cuenta) {
+    $monedaCuenta[] = $cuenta["cue_tipo_moneda"];
+  }
+  $conteoMonedas = array_count_values($monedaCuenta);
+
+  if (isset($conteoMonedas["PESO"]) && $conteoMonedas["PESO"] >= 2 || isset($conteoMonedas["DOLAR"]) && $conteoMonedas["DOLAR"] >= 2) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en" style="background-color: white; height: 100%;">
 
@@ -127,21 +139,21 @@ if ($resultado === true) {
           <hr>
           <br>
           <?php
-          echo '<table class="table table-hover text-center">';
-          echo '<thead>';
-          echo '<tr>';
-          echo '<th scope="col">#</th>';
-          echo '<th scope="col">Nro. Cuenta</th>';
-          echo '<th scope="col">Tipo Cuenta</th>';
-          echo '<th scope="col">C.B.U.</th>';
-          echo '<th scope="col">Alias</th>';
-          echo '<th scope="col">Moneda</th> ';
-          echo '<th scope="col">Saldo</th> ';
-          echo '</tr> ';
-          echo '</thead> ';
-          echo '<tbody id="detalleResultadoTabla">';
-          if ($cuentas) {
-            foreach ($cuentas as $key => $cuenta) {
+          if ($cuentasUsuario !== false) {
+            echo '<table class="table table-hover text-center">';
+            echo '<thead>';
+            echo '<tr>';
+            echo '<th scope="col">#</th>';
+            echo '<th scope="col">Nro. Cuenta</th>';
+            echo '<th scope="col">Tipo Cuenta</th>';
+            echo '<th scope="col">C.B.U.</th>';
+            echo '<th scope="col">Alias</th>';
+            echo '<th scope="col">Moneda</th> ';
+            echo '<th scope="col">Saldo</th> ';
+            echo '</tr> ';
+            echo '</thead> ';
+            echo '<tbody id="detalleResultadoTabla">';
+            foreach ($cuentasUsuario as $key => $cuenta) {
               echo '<tr>';
               echo '<th scope="col">' . $key . '</th>';
               echo '<td scope="col">' . $cuenta["cue_nro_cuenta"] . '</th>';
@@ -165,26 +177,26 @@ if ($resultado === true) {
         </div>
       </div>
     </div>
-    <br>
-    <br>
-    <h3> Operaciones </h3>
-    <hr>
     <?php
-    if ($cuentas) {
-      echo '<div class="py-4 mb-5 d-flex" style = "padding: 0px auto;">';
+    if ($cuentasUsuario !== false) {
+      echo '<br>';
+      echo '<br>';
+      echo '<h3> Operaciones </h3>';
+      echo '<hr>';
+      echo '<div class="py-4 mb-5 d-flex" style="padding: 0px auto;">';
+
+      //Verifico si puedo habilitar transferencias en funcion de las cuentas del usuario
+      $operaciones = habilitaTransferencia($cuentasUsuario);
       echo '<form action="transferencias.php">';
-      echo '<button type="submit" id="transferir"  class="btn btn-primary mx-3" style="width:200px;font-weight:600;height:50px;">Transferir</button>';
+      if ($operaciones) {
+        echo '<button type="submit" id="transferir" class="btn btn-primary mx-3" style="width:200px;font-weight:600;height:50px;">Transferir</button>';
+      } else {
+        echo '<button type="submit" id="transferir" class="btn btn-secondary disabled mx-3" style="width:200px;font-weight:600;height:50px;">Transferir</button>';
+      }
       echo '</form>';
       echo '<form action="movimientos.php">';
-      echo '<button type="submit" id="verMovimientos"  class="btn btn-success mx-3" style="width:200px;font-weight:600;height:50px;">Ver movimientos</button>';
+      echo '<button type="submit" id="verMovimientos" class="btn btn-success mx-3" style="width:200px;font-weight:600;height:50px;">Ver Movimientos</button>';
       echo '</form>';
-      // echo '<form action="login.php?logout" >';
-      // echo '<button type="submit" id="verMovimientos" value="logout" class="btn btn-danger mx-3" style="width:200px;font-weight:600;height:50px;">Volver</button>';
-      // echo '</form>';
-      echo ' </div>';
-    } else {
-      echo '<div class="align-items-center py-4 mb-5">';
-      echo '<p style="color:red; font-weight:700">No tiene cuentas para poder </p>';
       echo ' </div>';
     }
     ?>

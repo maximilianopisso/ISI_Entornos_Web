@@ -2,63 +2,60 @@
 require_once './app/classes/database.php';
 require_once './app/classes/usuario.php';
 
-if ($_POST !== array()) {
-  if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = (isset($_POST['email']) && is_string($_POST['email'])) ? trim($_POST['email']) : '';
-    $password = (isset($_POST['password']) && is_string($_POST['password'])) ? trim($_POST['password']) : '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+  $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+  $password = isset($_POST['password']) ? trim($_POST['password']) : '';
 
-    try {
-      //Validaciones campos formularios login
-      if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8 || strlen($password) > 15) {
-        throw new Exception("Los campos ingresados email o password son incorrectos");
-      }
+  try {
+    // Validaciones campos formularios login
+    if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($password) < 8 || strlen($password) > 15) {
+      throw new Exception("Los campos ingresados email o password son incorrectos");
+    }
 
-      $database = new Database();
-      //Validacion Resultado Busqueda en BD para el usuario
-      $resultado = $database->getUsuarioByEmail($email);
-      if (!$resultado) {
-        $msjError = "El usuario no se encuentra registrado";
-      } else {
-        $user2 = $resultado;
-        $user = $user2[0];
-        $usuario = new Usuario(
-          $user["user_id"],
-          $user["user_nombre"],
-          $user["user_apellido"],
-          $user["user_email"],
-          $user["user_password"],
-          $user["user_contacto"],
-          $user["user_sexo"],
-          $user["user_intentos"],
-          $user["user_habilitado"],
+    $databaseUser = new Database();
+    // Validacion Resultado Busqueda en BD para el usuario
+    $resultado = $databaseUser->getUsuarioByEmail($email);
+    if (!$resultado) {
+      $msjError = "El usuario no se encuentra registrado";
+    } else {
+      $user = $resultado[0];
+      $usuario = new Usuario(
+        $user["user_id"],
+        $user["user_nombre"],
+        $user["user_apellido"],
+        $user["user_email"],
+        $user["user_password"],
+        $user["user_contacto"],
+        $user["user_sexo"],
+        $user["user_intentos"],
+        $user["user_habilitado"],
+      );
+
+      $validacion = $usuario->validarUsuario($email, $password);
+
+      if ($validacion === true) {
+        // Inicia nueva sesión en PHP
+        session_start();
+
+        // Guarda los datos del usuario en la sesión PHP
+        $_SESSION['user'] = array(
+          'id' => $usuario->getId(),
+          'nombre' => $usuario->getNombre(),
+          'apellido' => $usuario->getApellido(),
+          'sexo' => $usuario->getSexo(),
         );
 
-        $validacion = $usuario->validarUsuario($email, $password);
-
-        if ($validacion === true) {
-          //Inicia nueva session en PHP
-          session_start();
-
-          // Guarda los datos del usuario en la session PHP
-          $_SESSION['user'] = array(
-            'id' => $usuario->getId(),
-            'nombre' => $usuario->getNombre(),
-            'apellido' => $usuario->getApellido(),
-            'sexo' => $usuario->getSexo(),
-          );
-
-          // Redirige a la home del usuario
-          header('Location: home.php', true, 302);
-          exit();
-        }
+        // Redirige a la home del usuario
+        header('Location: home.php', true, 302);
+        exit();
       }
-    } catch (Exception $e) {
-      $msjError = $e->getMessage();
     }
+  } catch (Exception $e) {
+    $msjError = $e->getMessage();
   }
 }
 
-// Para destruir el session de PHP
+// Para destruir la sesión de PHP
 if (isset($_GET['logout'])) {
   if (session_start()) {
     session_destroy();

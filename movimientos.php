@@ -5,53 +5,53 @@ require_once "./app/classes/cuenta.php";
 require_once "./app/classes/movimiento.php";
 require_once "./app/classes/utils.php";
 
-if (session_start()) {
-  // Obtenermos el usuario
-  $user_id = (isset($_SESSION['user']['id']) ? $_SESSION['user']['id'] : '');
-  try {
-    if (empty($user_id)) {
-      throw new Exception("No se pudieron obtener los datos de la sesión", 400);
-    }
-    $databaseUser = new Database();
-    $resultado = $databaseUser->getUsuarioById($user_id);
-    if (!$resultado) {
-      throw new Exception("No se ha podido recuperar los datos del usuario");
-    } else {
-      $usuario = new Usuario(
-        $resultado[0]["user_id"],
-        $resultado[0]["user_nombre"],
-        $resultado[0]["user_apellido"],
-        $resultado[0]["user_email"],
-        $resultado[0]["user_password"],
-        $resultado[0]["user_contacto"],
-        $resultado[0]["user_sexo"],
-        $resultado[0]["user_intentos"],
-        $resultado[0]["user_habilitado"]
-      );
-    }
-    $cuentasUsuario = $usuario->obtenerCuentas();
-  } catch (Exception $e) {
-    $error = $e->getMessage();
-    $codeError = $e->getCode();
-    Utils::alert('Error: ' . $codeError);
-    if ($codeError = 400) {
-      header("Location: error.html");
-    } else {
-      Utils::alert('Error: ' . $error);
-    }
+define('MAX_CANT_MOVIMIENTOS', 10);
+// Comprobar si la sesión está iniciada
+try {
+  if (!session_start()) {
+    throw new Exception("Error al cargar la sesión del usuario logueado");
   }
-} else {
-  Utils::alert("Error al cargar la sesion del usuario logueado");
+
+  // Obtener datos de la session PHP 
+  $user_id = $_SESSION['user']['id'] ?? '';
+  if (empty($user_id)) {
+    throw new Exception("No se pudieron obtener los datos de la sesión");
+  }
+
+  // Obtener el usuario desde BD
+  $databaseUser = new Database();
+  $resultado = $databaseUser->getUsuarioById($user_id);
+
+  if (!$resultado) {
+    throw new Exception("No se ha podido recuperar los datos del usuario");
+  }
+
+  $usuario = new Usuario(
+    $resultado[0]["user_id"],
+    $resultado[0]["user_nombre"],
+    $resultado[0]["user_apellido"],
+    $resultado[0]["user_email"],
+    $resultado[0]["user_password"],
+    $resultado[0]["user_contacto"],
+    $resultado[0]["user_sexo"],
+    $resultado[0]["user_intentos"],
+    $resultado[0]["user_habilitado"]
+  );
+  // Obtener las cuentas del usuario
+  $cuentasUsuario = $usuario->obtenerCuentas();
+} catch (Exception $e) {
+  header("Location: error.html");
 }
 
+// Procesar formulario de selección de cuenta
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  $nroCuenta = (isset($_POST['selectCuenta']) && is_string($_POST['selectCuenta'])) ? trim($_POST['selectCuenta']) : 'seleccionar';
+  $nroCuenta = $_POST['selectCuenta'] ?? 'seleccionar';
 
-  // Obtenemos movimientos de la cuenta seleccionada
+  // Obtener movimientos de la cuenta seleccionada
   if ($nroCuenta !== "seleccionar") {
     try {
-      $databaseCuenta = new Database();
-      $datosCuenta = $databaseCuenta->getCuentabyNroCuenta($nroCuenta);
+      $database = new Database();
+      $datosCuenta = $database->getCuentabyNroCuenta($nroCuenta);
       $cuentaSeleccionada = new Cuenta(
         $datosCuenta[0]["cue_id"],
         $datosCuenta[0]["cue_user_id"],
@@ -60,16 +60,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $datosCuenta[0]["cue_tipo_moneda"],
         $datosCuenta[0]["cue_cbu"],
         $datosCuenta[0]["cue_alias"],
-        $datosCuenta[0]["cue_saldo"],
+        $datosCuenta[0]["cue_saldo"]
       );
       $movimientosCuenta = $cuentaSeleccionada->obtenerMovimientos();
     } catch (Exception $e) {
-      $codeError = $e->getCode();
       $error = $e->getMessage();
-      $pos = strpos($error, "C:", true);
-      $shortError = substr($error, 0, $pos - 4);
-      // Utils::alert("Codigo Error ' . $codeError . ': ' . $shortError  .  '");
-      $msjError = "'Código error '  .$codeError .': ' .$shortError";
+      Utils::alert('Error: ' . $error);
     }
   } else {
     $msjError = "No se ha seleccionado una cuenta";
@@ -143,8 +139,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </ol>
     </nav>
     <?php
+    echo '<div id="movimientos" class="col-12 pt-4">';
     if (isset($cuentasUsuario) && count($cuentasUsuario) !== 0) {
-      echo '<div id="movimientos" class="col-12 pt-4">';
       echo '<form action="movimientos.php" method="post">';
       echo '<label for="" style="font-weight: 600;">Seleccioná tu cuenta:</label>';
       echo '<br>';
@@ -167,37 +163,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       echo '</div>';
       echo '<button id="verMovimientos" type="submit" class="btn btn-success" style= "width:200px;height:50px;font-weight:600;">Ver Movimientos</button>';
       echo '</form>';
-      echo '</div>';
     } else {
       echo '<p style="color:blue; font-weight:700">No posee cuentas</p>';
     }
-    ?>
-    <br>
-    <br>
-    <h3>Movimientos</h3>
-    <hr>
-    <br>
-    <?php
+    echo '</div>';
+    echo '<br>';
+    echo '<br>';
+    echo '<h3>Últimos Movimientos</h3>';
+    echo '<hr>';
+    echo '<br>';
     if (isset($cuentaSeleccionada)) {
       // Si existen movimientos en la cuenta seleccionada, los muestro.
       if ($movimientosCuenta !== false && count($movimientosCuenta) !== 0) {
+        $maxRegistros = min(count($movimientosCuenta), MAX_CANT_MOVIMIENTOS);
         echo '<table class="table table-hover text-center">';
         echo '<thead id="headTablaMovimientos">';
         echo '<tr>';
         echo '<th scope="col">#</th>';
         echo '<th scope="col">Fecha</th>';
-        echo '<th scope="col">Nro. Transaccion</th>';
-        echo '<th scope="col">Descripcion</th>';
+        echo '<th scope="col">Nro. Transacción</th>';
+        echo '<th scope="col">Descripción</th>';
         echo '<th scope="col">Importe</th>';
         echo '<th scope="col">Saldo</th>';
         echo '</tr> ';
         echo '</thead> ';
         echo '<tbody id="bodyTablaMovimientos">';
-        //Se coloca el signo correcto de la moneda, en funcion del tipo de moneda de la cuenta seleccionada.
+        // Se coloca el signo correcto de la moneda, en funcion del tipo de moneda de la cuenta seleccionada.
         $moneda = ($cuentaSeleccionada->getTipoMoneda() === "PESO" ? '$ ' : 'U$S ');
-        foreach ($movimientosCuenta as $key => $movimiento) {
+
+        for ($i = 0; $i < $maxRegistros; $i++) {
+          $movimiento = $movimientosCuenta[$i];
           echo '<tr>';
-          echo '<td scope="col">' . $key . '</td>';
+          echo '<td scope="col">' . $i + 1 . '</td>';
           echo '<td scope="col">' . $movimiento["mov_fecha"] . '</th>';
           echo '<td scope="col">' . $movimiento["mov_nro_transaccion"] . '</th>';
           echo '<td scope="col">' . $movimiento["mov_descripcion"] . '</th>';
@@ -215,11 +212,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo ' </table>';
       } else {
         //Cuando no existen movimientos en la cuenta seleccionada, muestro el msj
-        echo '<p style="color:blue; font-weight:700">No posee movimientos asociados en la cuenta seleccionada.</p>';
+        echo '<p style="color:blue; font-weight:700">La cuenta seleccionada no registra ningún movimiento.</p>';
       }
     } else {
       //Hasta que no se seleccione una cuenta, muestro el msj.
-      echo '<p style="color:red; font-weight:700">Seleccione una cuenta para ver sus movimientos.</p>';
+      echo '<p style="color:red; font-weight:700">Seleccione una cuenta para ver sus últimos movimientos.</p>';
     }
     echo '</div>';
     echo '<br>';
