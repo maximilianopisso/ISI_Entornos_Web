@@ -112,10 +112,18 @@ class Cuenta
         }
     }
 
-    
-        public function transferirImporte(Cuenta $cuentaDestino, $importe
-        {
+
+    public function registrarTransacccion(Cuenta $cuentaDestino, $importe)
+    {
         try {
+            //Verifica y formatea el importe
+            if (is_numeric($importe)) {
+                $importe = floatval($importe);
+                $importe = round($importe, 2);
+            } else {
+                throw new Exception("El importe ingresado no posee un formato válido");
+            }
+
             // Verifica si las cuentas tienen el mismo tipo de moneda
             if ($this->tipoMoneda !== $cuentaDestino->getTipoMoneda()) {
                 throw new Exception("Las cuentas seleccionadas deben tener la misma moneda.");
@@ -137,65 +145,12 @@ class Cuenta
             // Suma el importe a la cuenta destino, transferido a desde la cuenta origen.
             $cuentaDestino->sumarSaldo($importe);
 
-
-            // Actualiza saldo en BD de la cuenta origen.
-            $updateCuentaOrigen = $this->actualizarSaldo();
-            if ($updateCuentaOrigen === false) {
-                throw new Exception("No se pudo efectuar la actualizacion del saldo en la cuenta origen");
-            }
-
-            // Actualiza saldo en BD de la cuenta destino.
-            $updateCuentaDestino = $cuentaDestino->actualizarSaldo();
-            if ($updateCuentaDestino === false) {
-                throw new Exception("No se pudo efectuar la actualizacion del saldo en la cuenta destino");
-            }
-
-            //Registro nuevo movimiento en cuenta origen
-            $regMovOrigen = $this->registrarMovimiento($cuentaDestino->getId(), "Transferencia de dinero", $importe);
-            if ($regMovOrigen === false) {
-                throw new Exception("No se pudo registrar el movimiento en la cuenta origen");
-            }
-
-            //Registro nuevo movimiento en cuenta destino
-            $regMovDetino = $cuentaDestino->registrarMovimiento($this->id, "Ingreso de dinero", $importe);
-            if ($regMovDetino === false) {
-                throw new Exception("No se pudo registrar el movimiento en la cuenta destino");
-            }
+            //Registra operacion en base de datos
+            $database = new Database();
+            $database->registrarOperacion($this->id, $this->saldo, $cuentaDestino, $importe);
             return true;
         } catch (Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
-            // throw new Exception("Falla en el registro de los movimientos entre cuentas", $e->getCode());
+            throw new Exception($e);
         }
     }
 }
-
-// ASI DEBERIA SER !! POR LO MENOS PARA ESTE CASO !! PARA PODER HACER ROLLBACK EN CASO QUE FALLE ALGUNA
-// try {
-//     // Iniciar transacción
-//     $this->conexion->begin_transaction();
-
-//     // Ejecutar consulta 1
-//     $query1 = "UPDATE tabla1 SET columna1 = 'valor1' WHERE id = 1";
-//     $resultado1 = $this->conexion->query($query1);
-//     if ($resultado1 === false) {
-//         throw new Exception($this->conexion->error);
-//     }
-
-//     // Ejecutar consulta 2
-//     $query2 = "UPDATE tabla2 SET columna2 = 'valor2' WHERE id = 2";
-//     $resultado2 = $this->conexion->query($query2);
-//     if ($resultado2 === false) {
-//         throw new Exception($this->conexion->error);
-//     }
-
-//     // Confirmar la transacción
-//     $this->conexion->commit();
-
-//     // Realizar otras acciones después de la confirmación
-// } catch (Exception $e) {
-//     // En caso de error, deshacer la transacción
-//     $this->conexion->rollback();
-
-//     // Manejar el error
-//     throw $e; // Relanzar la excepción para que sea manejada en otro nivel
-// }

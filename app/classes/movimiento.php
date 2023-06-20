@@ -35,6 +35,10 @@ class Movimiento
         $this->saldo = $saldo;
     }
 
+    public function getInfoMovimiento()
+    {
+           return array($this->idOrigen, $this->idDestino, $this->fecha, $this->nroTransaccion, $this->descripcion, $this->importe, $this->saldo);
+    }
 
     public function registrarMovimiento()
     {

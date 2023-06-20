@@ -17,30 +17,11 @@ class Database
             if ($this->conexion->connect_error) {
                 throw new Exception($this->conexion->connect_error);
             }
-
-            // Habilitar el modo de autocommit
-            $this->conexion->autocommit(false);
         } catch (Exception $e) {
             throw new Exception($e, $e->getCode());
         }
     }
 
-    public function beginTransaction()
-    {
-        $this->conexion->begin_transaction();
-    }
-
-    public function commit()
-    {
-        $this->conexion->commit();
-        // $this->conexion->autocommit(true);
-    }
-
-    public function rollback()
-    {
-        $this->conexion->rollback();
-        // $this->conexion->autocommit(true);
-    }
     /**
      * Método que devuelve el tipo de dato que se pasa por parametro.
      */
@@ -99,13 +80,14 @@ class Database
             //Se devuelve el resultado, y el numero de filas afectadas.
             return array($data, $filasAfectadas);
         } catch (Exception $e) {
+
             if ($sentencia) {
                 $sentencia->close();
             }
             if ($this->conexion) {
                 $this->conexion->close();
             }
-            throw new Exception("Falla al ejecutar la sentencia SELECT", $e->getCode());
+            throw new Exception('Falla al ejecutar la sentencia SELECT' . $e->getMessage(), $e->getCode());
         }
     }
 
@@ -114,51 +96,7 @@ class Database
      */
     public function executeUpdateQuery($query, $params = [])
     {
-
-
-        // try {
-        //     $sentencia = $this->conexion->prepare($query);
-
-        //     if (!$sentencia) {
-        //         throw new Exception($this->conexion->error);
-        //     }
-
-        //     // En caso que la consulta contenga parametros, se preparan
-        //     if (!empty($params)) {
-        //         $tipoDatos = $this->getTypeData($params);
-        //         $sentencia->bind_param($tipoDatos, ...$params);
-        //     }
-
-        //     // Ejecuta la sentencia SQL
-        //     if (!$sentencia->execute()) {
-        //         throw new Exception($this->conexion->error);
-        //     }
-
-        //     // Obtengo resultados 
-        //     $resultado = $sentencia->get_result();
-        //     $filasAfectadas = $sentencia->affected_rows;
-
-        //     // Cierro sentencia y conecxion con BD
-        //     $sentencia->close();
-        //     $this->conexion->close();
-
-        //     //Se devuelve el resultado, y el numero de filas afectadas.
-        //     return array($resultado, $filasAfectadas);
-        // } catch (Exception $e) {
-        //     if ($sentencia) {
-        //         $sentencia->close();
-        //     }
-        //     if ($this->conexion) {
-        //         $this->conexion->close();
-        //     }
-        //     throw new Exception("Falla al ejecutar la sentencia UPDATE", $e->getCode());
-        // }
-
-        $filasAfectadas = 0;
-
         try {
-            // Inicia una transacción
-            $this->conexion->begin_transaction();
 
             $sentencia = $this->conexion->prepare($query);
 
@@ -191,8 +129,6 @@ class Database
             // Se devuelve el resultado y el número de filas afectadas
             return array($resultado, $filasAfectadas);
         } catch (Exception $e) {
-            // Realiza un rollback en caso de error
-            $this->conexion->rollback();
 
             if ($sentencia) {
                 $sentencia->close();
@@ -200,7 +136,8 @@ class Database
             if ($this->conexion) {
                 $this->conexion->close();
             }
-            throw new Exception("Falla al ejecutar la sentencia UPDATE", $e->getCode());
+
+            throw new Exception('Falla al ejecutar la sentencia UPDATE' . $e->getMessage(), $e->getCode());
         }
     }
 
@@ -212,8 +149,6 @@ class Database
         $filasAfectadas = 0;
 
         try {
-            // Inicia una transacción
-            $this->conexion->begin_transaction();
 
             $sentencia = $this->conexion->prepare($query);
 
@@ -236,9 +171,6 @@ class Database
             $resultado = $sentencia->get_result();
             $filasAfectadas = $sentencia->affected_rows;
 
-            // Confirma la transacción
-            $this->conexion->commit();
-
             // Cierro sentencia y conexión con BD
             $sentencia->close();
             $this->conexion->close();
@@ -246,19 +178,18 @@ class Database
             // Se devuelve el resultado y el número de filas afectadas
             return array($resultado, $filasAfectadas);
         } catch (Exception $e) {
-            // Realiza un rollback en caso de error
-            $this->conexion->rollback();
 
             if ($sentencia) {
                 $sentencia->close();
             }
+
             if ($this->conexion) {
                 $this->conexion->close();
             }
-            throw new Exception("Falla al ejecutar la sentencia INSERT", $e->getCode());
+
+            throw new Exception('Falla al ejecutar la sentencia INSERT' . $e->getMessage(), $e->getCode());
         }
     }
-
 
     public function getUsuarioByEmail($email)
     {
@@ -289,6 +220,7 @@ class Database
             throw new Exception("Falla al obtener usuario por id conocido", $e->getCode());
         }
     }
+
     public function getCuentabyNroCuenta($nroCuenta)
     {
         $query = "SELECT * FROM cuentas WHERE cue_nro_cuenta = ?";
@@ -319,101 +251,95 @@ class Database
         }
     }
 
-    public function registrarTransaccion(Cuenta $cuentaOrigen, Cuenta $cuentaDestino, $importe)
+    public function executeQueries($queries, $params)
     {
         try {
-            // Verifica si las cuentas tienen el mismo tipo de moneda
-            $monedaCuentaOrigen = $cuentaDestino->getTipoMoneda();
-            $monedaCuentaDestino = $cuentaDestino->getTipoMoneda();
+            // Deshabilita el autocommit
+            $this->conexion->autocommit(false);
 
-            if ($monedaCuentaOrigen !== $monedaCuentaDestino) {
-                throw new Exception("Las cuentas seleccionadas deben tener la misma moneda.");
+            // Inicia la transacción
+            $this->conexion->begin_transaction();
+
+            foreach ($queries as $key => $query) {
+
+                // for ($$key = 0; $$key < count($queries); $$key++) {
+
+                $sentencia = $this->conexion->prepare($query);
+
+                if (!$sentencia) {
+                    throw new Exception($this->conexion->error);
+                }
+
+                if (!empty($params[$key])) {
+                    $tipoDatos = $this->getTypeData($params[$key]);
+                    $sentencia->bind_param($tipoDatos, ...$params[$key]);
+                }
+
+                if (!$sentencia->execute()) {
+                    throw new Exception($sentencia->error);
+                }
+
+                $sentencia->close();
             }
 
-            // Verifica que el importe sea > a 0
-            if ($importe < 0) {
-                throw new Exception("El importe deber ser superior a $0.00");
-            }
+            // Realiza el commit
+            $this->conexion->commit();
 
-            // Verifica si la cuenta origen tiene suficiente saldo
-            $saldoOringen = $cuentaOrigen->getSaldo();
-            if ($saldoOringen < $importe) {
-                throw new Exception("El saldo de la cuenta de origen es insuficiente.");
-            }
-
-            // Resta el importe a transferir desde la cuenta origen
-            $saldoOringen -= $importe;
-
-            // Suma el importe a la cuenta destino, transferido a desde la cuenta origen.
-            $cuentaDestino->sumarSaldo($importe);
-
-            // Inicia una transacción
-            $this->beginTransaction();
-
-            // Ejecución de la primera consulta
-            $database = new Database();
-            $query = "UPDATE cuentas SET cue_saldo = ? WHERE cue_id = ?";
-            $resultado = $database->executeUpdateQuery($query, [$this->saldo, $this->id]);
-            if ($resultado[1] !== 0) {
-                return true;
-            } else {
-                return false;
-            };
-            $query1 = "INSERT INTO tabla1 (columna1, columna2) VALUES (?, ?)";
-            $resultado1 = $this->conexion->executeInsertQuery($query1, $params1);
-
-            // Verifica el resultado de la primera consulta
-            if ($resultado1[1] === 0) {
-                throw new Exception("Fallo en la consulta 1");
-            }
-
-            // Ejecución de la segunda consulta
-            $query2 = "UPDATE tabla2 SET columna1 = ? WHERE id = ?";
-            $params2 = [valor3, valor4];
-            $resultado2 = $database->executeUpdateQuery($query2, $params2);
-
-            // Verifica el resultado de la segunda consulta
-            if ($resultado2[1] === 0) {
-                throw new Exception("Fallo en la consulta 2");
-            }
-
-            // Ejecución de la tercera consulta
-            $query3 = "DELETE FROM tabla3 WHERE id = ?";
-            $params3 = [valor5];
-            $resultado3 = $database->executeDeleteQuery($query3, $params3);
-
-            // Verifica el resultado de la tercera consulta
-            if ($resultado3[1] === 0) {
-                throw new Exception("Fallo en la consulta 3");
-            }
-
-            // Ejecución de la cuarta consulta
-            $query4 = "INSERT INTO tabla4 (columna1) VALUES (?)";
-            $params4 = [valor6];
-            $resultado4 = $database->executeInsertQuery($query4, $params4);
-
-            // Verifica el resultado de la cuarta consulta
-            if ($resultado4[1] === 0) {
-                throw new Exception("Fallo en la consulta 4");
-            }
-
-            // Si todas las consultas se ejecutaron correctamente, se realiza el commit
-            $database->commit();
-
-            // Se cierra la conexión con la base de datos
-            $database->closeConnection();
-
-            // Realizar cualquier otra acción después de las consultas exitosas
-
+            // Cierra conexion 
+            $this->conexion->close();
         } catch (Exception $e) {
-            // Si hubo algún error, se realiza el rollback
-            $database->rollback();
 
-            // Se cierra la conexión con la base de datos
-            $database->closeConnection();
+            if ($sentencia) {
+                $sentencia->close();
+            }
 
+            if ($this->conexion) {
+                // Realiza el rollback
+                $this->conexion->rollback();
+                $this->conexion->close();
+            }
+
+            throw new Exception($e);
+        }
+    }
+
+    public function registrarOperacion($idCuentaOrigen, $saldoCuentaOrigen, Cuenta $cuentaDestino, $importe)
+    {
+        $queries = array();
+        $params = array();
+        $saldoCuentaOrigen =  round($saldoCuentaOrigen, 2);
+        $saldoCuentaDestino = round($cuentaDestino->getSaldo(), 2);
+        $importe =  round($importe, 2);
+
+        try {
+            // Query para actualizar saldo de cuenta origen
+            $queryUpdateSaldoOrigen = "UPDATE cuentas SET cue_saldo = ? WHERE cue_id = ?";
+            array_push($queries, $queryUpdateSaldoOrigen);
+            array_push($params, [$saldoCuentaOrigen, $idCuentaOrigen]);
+
+            // Query para actualizar saldo de cuenta destino
+            $queryUpdateSaldoDestino = "UPDATE cuentas SET cue_saldo = ? WHERE cue_id = ?";
+            array_push($queries, $queryUpdateSaldoDestino);
+            array_push($params, [$saldoCuentaDestino, $cuentaDestino->getId()]);
+
+            // Query para insertar movimiento cuenta origen
+            $queryInsertMovimientoOrigen = "INSERT INTO movimientos (`mov_id`, `mov_cuenta_origen_id`, `mov_cuenta_destino_id`, `mov_fecha`, `mov_nro_transaccion`, `mov_descripcion`, `mov_importe`, `mov_saldo`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
+            array_push($queries, $queryInsertMovimientoOrigen);
+            $movimientoOrigen = new Movimiento($idCuentaOrigen, $cuentaDestino->getId(), "Transferencia de dinero", $importe, $saldoCuentaOrigen);
+            array_push($params, $movimientoOrigen->getInfoMovimiento());
+
+            // Query para insertar movimiento cuenta destino
+            $queryInsertMovimientoDestino = "INSERT INTO movimientos (`mov_id`, `mov_cuenta_origen_id`, `mov_cuenta_destino_id`, `mov_fecha`, `mov_nro_transaccion`, `mov_descripcion`, `mov_importe`, `mov_saldo`) VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)";
+            array_push($queries, $queryInsertMovimientoDestino);
+            $movimientoDestino = new Movimiento($cuentaDestino->getId(), $idCuentaOrigen, "Ingreso de dinero", $importe, $saldoCuentaDestino);
+            array_push($params, $movimientoDestino->getInfoMovimiento());
+
+            $this->executeQueries($queries, $params);
+
+            return true;
+        } catch (Exception $e) {
             // Manejo del error
-            echo "Error: " . $e->getMessage();
+            throw new Exception("Falla al intentar registrar la transaccion");
         }
     }
 }

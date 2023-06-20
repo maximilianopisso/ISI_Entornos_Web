@@ -94,9 +94,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($cuentaOrigen->getTipoMoneda() !== $cuentaDestino->getTipoMoneda()) {
       throw new Exception("Las cuentas deben tener la misma moneda");
     }
-    $database = new Database();
-    $transaccion = $database->registrarTransaccion($cuentaOrigen, $cuentaDestino, $importe);
-    $transaccion = $cuentaOrigen->transferirImporte($cuentaDestino, $importe);
+
+    $transaccion = $cuentaOrigen->registrarTransacccion($cuentaDestino, $importe);
     if ($transaccion) {
       $msjExito = "La transaccción se ha realizado con éxito";
     }
