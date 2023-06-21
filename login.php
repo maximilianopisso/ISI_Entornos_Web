@@ -58,6 +58,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Para destruir la sesión de PHP
 if (isset($_GET['logout'])) {
   if (session_start()) {
+    $params = session_get_cookie_params();
+    setcookie(
+      session_name(),         // name
+      '',                     // value
+      1,
+      $params['path'],
+      $params['domain'],
+      $params['secure'],
+      $params['httponly']                     // expire     
+    );
     session_destroy();
   }
   header("Location: login.php");
