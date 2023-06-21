@@ -90,13 +90,11 @@ if (isset($_GET['logout'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="./css/style.css">
-  <!-- REVISAR  -->
-  <link rel="stylesheet" href="./css/styles2.css">
+  <link rel="stylesheet" href="./css/appStyle.css">
 
 </head>
 
-<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px;">
+<body id="body-login">
   <!-- header-->
   <header class="fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -117,34 +115,34 @@ if (isset($_GET['logout'])) {
   </header>
 
   <!-- Login -->
-  <section id="inicio" class="container" style="margin-top: 0px;">
+  <section id="login" class="container" style="margin-top: 0px;">
     <div class="row justify-content-center">
-      <img id="icono" src="./images/login.svg" style="width: 150px; align-items: center; display: block;" class="" alt="Imagen alusoria a la necesidad de 
+      <img id="icono" src="./images/login.svg" style="" class="" alt="Imagen alusoria a la necesidad de 
     realizar un logeo con usurio y contraseña para acceder a los servicios">
       <h1 style="text-align: center; margin: 0px" class="py-2">Ingresar a IBWallet</h1>
     </div>
 
     <!-- Formulario Login -->
-    <div class="col-12 justify-content-center" style="margin: 10px auto; max-width:70%">
+    <div class="col-12 justify-content-center" style="margin: 5px auto; max-width:60%">
       <form id="formularioLogin" class="width: 100%" action="login.php" method="post">
         <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 0px auto ;">
           <label for="inputEmail" class="form-label">Email</label>
           <input type="text" class="form-control" name="email" id="email">
         </div>
 
-        <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 0px auto;">
+        <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 10px auto;">
           <label for="inputPassword" class="form-label">Password</label>
           <input type="password" class="form-control" name="password" id="password">
         </div>
 
-        <div class="col-12 mensaje-container" id="msjError" style="margin: 1vh 0px; max-height: 50x; height: 50px;">
+        <div class="col-12 mensaje-container my-2" id="msjError" style="height: 35px; max-height: 35px;">
           <?php
           if (isset($msjError) && !empty($msjError)) {
-            echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
+            echo '<div id="alerta" class="alert alert-danger" role="alert" style="height:25px; max-height: 25px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
             echo '<script>
               setTimeout(function() {
                   document.getElementById("alerta").style.display = "none";
-              }, 4000);
+              }, 2000);
           </script>';
           }
           ?>

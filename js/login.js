@@ -1,4 +1,4 @@
-console.log("SE CARGA SCRIPT LOGIN.JS");
+console.log("SE CARGA SCRIPT LOGIN2.JS");
 
 $("#formularioLogin").submit(function (e) {
     e.preventDefault(); // Evita que el formulario se envíe automáticamente
@@ -14,52 +14,36 @@ $("#formularioLogin").submit(function (e) {
 
     // Validaciones para input email
     if (email.trim() === "") {
-        showAlert("Debe ingresar un email.", "warning");
+        showAlert("Debe ingresar un email.");
         return;
     }
 
     if (emailRegex.exec(email) == null) {
-        showAlert("El email ingresado no posse un formato válido.", "warning");
+        showAlert("El email ingresado no posse un formato válido.");
         return;
     }
 
     // Validaciones para input password
     if (password.trim() === "") {
-        showAlert("Debe ingresar una contraseña.", "warning");
+        showAlert("Debe ingresar una contraseña.");
         return;
     }
 
     // Validación de longitud de contraseña
     if (passwordRegex.exec(password) == null) {
-        showAlert("La contraseña debe tener entre 8 y 15 caracteres alfanuméricos.", "warning");
+        showAlert("La contraseña debe tener entre 8 y 15 caracteres alfanuméricos.");
         return;
     }
     // Si todas las validaciones son exitosas, enviar el formulario
     this.submit();
 });
 
-function showAlert(message, type) {
-    // Crea el elemento de alerta de Bootstrap
-    var alertDiv = $("<div>").addClass("alert alert-" + type)
-        .attr("role", "alert")
-        .attr("id", "alerta")
-        .css({
-            // "height": "40px",
-            "max-height": "40px",
-            "font-weight": "600",
-            "display": "flex",
-            "align-items": "center",
-            "justify-content": "center",
-        })
-        .text(message);
-
-    // Agrega la alerta al contenedor específico
+function showAlert(message) {
     var container = $("#msjError");
     container.empty(); // Limpia el contenido anterior
-    container.append(alertDiv);
-
-    // Hace que la alerta desaparezca después de 4 segundos
+    container.append(`<div id="alerta" class="alert alert-warning" role="alert" style="height:25px; max-height: 25px; display: flex; align-items: center;justify-content: center; font-weight:600">${message}</div>`);
+    // Hace que la alerta desaparezca en el tiempo estipulado
     setTimeout(function () {
         container.empty();
-    }, 4000);
+    }, 2000);
 }

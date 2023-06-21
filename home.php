@@ -86,12 +86,11 @@ function habilitaTransferencia($cuentasUsuario)
   <link href="https:cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="./css/style.css">
-  <link rel="stylesheet" href="https:cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="./css/appStyle.css">
 
 </head>
 
-<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px;">
+<body>
   <!-- header -->
   <header class=" fixed-top">
     <nav class="navbar navbar-expand-lg navbar-dark">
@@ -113,10 +112,6 @@ function habilitaTransferencia($cuentasUsuario)
 
   <!-- home  -->
   <section id="home" class="container">
-    <br>
-    <br>
-    <br>
-    <br>
     <?php
     switch ($user_sexo) {
       case 'M':
@@ -129,18 +124,18 @@ function habilitaTransferencia($cuentasUsuario)
         $bienvenide = 'Bienvenide: ';
         break;
     }
-    echo '<p style="color: #87698d; font-size: 1.2em; text-align: right;" id="msjBienvenida">' . $bienvenida . $user_nombre . ',' . $user_apellido . '</p>';
+    echo '<p id="msjBienvenida">' . $bienvenida . $user_nombre . ',' . $user_apellido . '</p>';
     ?>
-    <br>
+
     <div id="cuentas" class="row align-items-start ">
       <div class="col-12">
         <div>
           <h3>Cuentas</h3>
           <hr>
-          <br>
+
           <?php
           if ($cuentasUsuario !== false) {
-            echo '<table class="table table-hover text-center">';
+            echo '<table class="table table-hover text-center estilo-tabla">';
             echo '<thead>';
             echo '<tr>';
             echo '<th scope="col">#</th>';
@@ -155,7 +150,7 @@ function habilitaTransferencia($cuentasUsuario)
             echo '<tbody id="detalleResultadoTabla">';
             foreach ($cuentasUsuario as $key => $cuenta) {
               echo '<tr>';
-              echo '<th scope="col">' . $key . '</th>';
+              echo '<td scope="col">' . $key + 1 . '</th>';
               echo '<td scope="col">' . $cuenta["cue_nro_cuenta"] . '</th>';
               echo '<td scope="col">' . $cuenta["cue_tipo_cuenta"] . '</th>';
               echo '<td scope="col">' . $cuenta["cue_cbu"] . '</th>';
@@ -179,11 +174,9 @@ function habilitaTransferencia($cuentasUsuario)
     </div>
     <?php
     if ($cuentasUsuario !== false) {
-      echo '<br>';
-      echo '<br>';
       echo '<h3> Operaciones </h3>';
       echo '<hr>';
-      echo '<div class="py-4 mb-5 d-flex" style="padding: 0px auto;">';
+      echo '<div class="d-flex" style="padding: 0px auto;">';
 
       //Verifico si puedo habilitar transferencias en funcion de las cuentas del usuario
       $operaciones = habilitaTransferencia($cuentasUsuario);

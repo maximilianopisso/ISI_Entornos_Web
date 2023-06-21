@@ -13,17 +13,17 @@ $("#formTransferencias").submit(function (e) {
 
     // Validaciones para input email
     if (cuentaOrigen.trim() === "seleccionar") {
-        showAlert("Debe ingresar una cuenta origen.", "warning");
+        showAlert("Debe ingresar una cuenta origen.");
         return;
     }
 
     if (cuentaDestino.trim() === "seleccionar") {
-        showAlert("Debe ingresar una cuenta destino.", "warning");
+        showAlert("Debe ingresar una cuenta destino.");
         return;
     }
 
     if (importeRegex.exec(importe) == null) {
-        showAlert("El importe deber ser numérico y el formato válido es xxx.xx", "warning");
+        showAlert("El importe deber ser numérico y el formato válido es xxx.xx");
         return;
     }
 
@@ -31,27 +31,12 @@ $("#formTransferencias").submit(function (e) {
     this.submit();
 });
 
-function showAlert(message, type) {
-    // Crea el elemento de alerta de Bootstrap
-    var alertDiv = $("<div>").addClass("alert alert-" + type)
-        .attr("role", "alert")
-        .attr("id", "alerta")
-        .css({
-            "max-height": "40px",
-            "font-weight": "600",
-            "display": "flex",
-            "align-items": "center",
-            "justify-content": "center",
-        })
-        .text(message);
-
-    // Agrega la alerta al contenedor específico
+function showAlert(message) {
     var container = $("#msjError");
     container.empty(); // Limpia el contenido anterior
-    container.append(alertDiv);
-
-    // Hace que la alerta desaparezca después de 4 segundos
+    container.append(`<div id="alerta" class="alert alert-warning" role="alert" style="height:25px; max-height: 25px; display: flex; align-items: center;justify-content: center; font-weight:600">${message}</div>`);
+    // Hace que la alerta desaparezca en el tiempo estipulado
     setTimeout(function () {
         container.empty();
-    }, 4000);
+    }, 2000);
 }

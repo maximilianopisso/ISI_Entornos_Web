@@ -99,13 +99,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
   <!-- CSS -->
-  <link rel="stylesheet" href="./css/style.css">
-  <!-- REVISAR  -->
-  <link rel="stylesheet" href="./css/styles2.css">
+  <link rel="stylesheet" href="./css/appStyle.css">
 
 </head>
 
-<body id="" style="background-image: linear-gradient(180deg, #fff9ff 20%, #f2e3ff 100%); height: 1200px;">
+<body>
 
   <!-- header -->
   <header class="fixed-top">
@@ -127,11 +125,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   </header>
 
   <!-- movimientos -->
-  <section id="section-mov" class="container">
-    <br>
-    <br>
-    <br>
-    <br>
+  <section id="movimientos" class="container">
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
       <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="home.php">Inicio</a></li>
@@ -151,13 +145,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
       }
       echo '</select>';
-      echo '<div class="col-8 mensaje-container" id="msjError" style="margin: 1vh 0px;max-height: 50x; height: 50px;">';
+      echo '<div class="col-12 mensaje-container my-2" id="msjError" style="height: 35px; max-height: 35px;">';
       if (isset($msjError)) {
-        echo '<div id="alerta" class="alert alert-danger role="alert" style="max-height: 40px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
+        echo
+        '<div id="alerta" class="alert alert-danger" role="alert" style="height:25px; max-height: 25px; font-weight: 600;display: flex; align-items: center;justify-content: center;">' . $msjError . '</div>';
         echo '<script>
               setTimeout(function() {
                   document.getElementById("alerta").style.display = "none";
-              }, 4000);
+              }, 2000);
           </script>';
       }
       echo '</div>';
@@ -168,15 +163,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     echo '</div>';
     echo '<br>';
-    echo '<br>';
     echo '<h3>Últimos Movimientos</h3>';
     echo '<hr>';
-    echo '<br>';
+
     if (isset($cuentaSeleccionada)) {
       // Si existen movimientos en la cuenta seleccionada, los muestro.
       if ($movimientosCuenta !== false && count($movimientosCuenta) !== 0) {
         $maxRegistros = min(count($movimientosCuenta), MAX_CANT_MOVIMIENTOS);
-        echo '<table class="table table-hover text-center">';
+        echo '<table class="table table-hover text-center estilo-tabla">';
         echo '<thead id="headTablaMovimientos">';
         echo '<tr>';
         echo '<th scope="col">#</th>';
