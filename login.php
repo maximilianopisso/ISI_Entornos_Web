@@ -117,8 +117,8 @@ if (isset($_GET['logout'])) {
   <!-- Login -->
   <section id="login" class="container" style="margin-top: 0px;">
     <div class="row justify-content-center">
-      <img id="icono" src="./images/login.svg" style="" class="" alt="Imagen alusoria a la necesidad de 
-    realizar un logeo con usurio y contraseña para acceder a los servicios">
+      <img id="icono" src="./images/login.svg" alt="Imagen alusoria a la necesidad de 
+    realizar un logeo con usuario y contraseña para acceder a los servicios">
       <h1 style="text-align: center; margin: 0px" class="py-2">Ingresar a IBWallet</h1>
     </div>
 
@@ -126,12 +126,12 @@ if (isset($_GET['logout'])) {
     <div class="col-12 justify-content-center" style="margin: 5px auto; max-width:60%">
       <form id="formularioLogin" class="width: 100%" action="login.php" method="post">
         <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 0px auto ;">
-          <label for="inputEmail" class="form-label">Email</label>
+          <label for="email" class="form-label">Email</label>
           <input type="text" class="form-control" name="email" id="email">
         </div>
 
         <div class="col-lg-8 col-md-8 col-sm-10" style="margin: 10px auto;">
-          <label for="inputPassword" class="form-label">Password</label>
+          <label for="password" class="form-label">Password</label>
           <input type="password" class="form-control" name="password" id="password">
         </div>
 

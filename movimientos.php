@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo '<div id="movimientos" class="col-12 pt-4">';
     if (isset($cuentasUsuario) && count($cuentasUsuario) !== 0) {
       echo '<form action="movimientos.php" method="post">';
-      echo '<label for="" style="font-weight: 600;">Seleccioná tu cuenta:</label>';
+      echo '<label for="seleccionarCuenta" style="font-weight: 600;">Seleccioná tu cuenta:</label>';
       echo '<br>';
       echo '<select class="form-control" style="width: 500px;" name="selectCuenta">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';

@@ -130,7 +130,7 @@ function habilitaTransferencia($cuentasUsuario)
     <div id="cuentas" class="row align-items-start ">
       <div class="col-12">
         <div>
-          <h3>Cuentas</h3>
+          <h3>Resúmen de Cuentas</h3>
           <hr>
 
           <?php

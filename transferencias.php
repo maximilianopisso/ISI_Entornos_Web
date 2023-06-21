@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $transaccion = $cuentaOrigen->registrarTransacccion($cuentaDestino, $importe);
     if ($transaccion) {
-      $msjExito = "La transaccción se ha realizado con éxito";
+      $msjExito = "La transacción se ha realizado con éxito";
     }
   } catch (Exception $e) {
     $msjError = $e->getMessage();
@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($cuentasUsuario !== false && count($cuentasUsuario) !== 0) {
       echo '<div id="transferencias" class="col-12 pt-2">';
       echo '<form id="formTransferencias" action="transferencias.php" method="post">';
-      echo '<label for="origen" style="font-weight: 600;">Cuenta origen:</label><br>';
+      echo '<label for="seleccionarCuentaOrigen" style="font-weight: 600;">Cuenta origen:</label><br>';
       echo '<select class="form-control" style="width: 500px;" name="cuentaOrigen" id="cuentaOrigen">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
       foreach ($cuentasUsuario as $cuenta) {
@@ -177,7 +177,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
       }
       echo '</select><br>';
-      echo '<label for="origen" style="font-weight: 600;">Cuenta Destino:</label><br>';
+      echo '<label for="seleccionarCuentaDestino" style="font-weight: 600;">Cuenta Destino:</label><br>';
       echo '<select class="form-control" style="width: 500px;" name="cuentaDestino" id="cuentaDestino">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
       foreach ($cuentasUsuario as $cuenta) {
