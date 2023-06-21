@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 21-06-2023 a las 20:49:57
+-- Tiempo de generación: 22-06-2023 a las 01:15:42
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 8.2.0
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `ibwallet`
 --
+CREATE DATABASE IF NOT EXISTS `ibwallet` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `ibwallet`;
 
 -- --------------------------------------------------------
 
@@ -67,10 +69,10 @@ CREATE TABLE `cuentas` (
 --
 
 INSERT INTO `cuentas` (`cue_id`, `cue_user_id`, `cue_nro_cuenta`, `cue_tipo_cuenta`, `cue_tipo_moneda`, `cue_cbu`, `cue_alias`, `cue_saldo`) VALUES
-(1, 1, '1110007388304', 'CA', 'PESO', '8178931111100090844390', 'PEPE.GRILLO.NOBO', 5525.04),
+(1, 1, '1110007388304', 'CA', 'PESO', '8178931111100090844390', 'PEPE.GRILLO.NOBO', 5128.14),
 (2, 1, '1110003463080', 'CC', 'PESO', '8178931111100090844390', 'PEPE.ARBOL.PEZ', 1700),
 (3, 1, '1110003983649', 'CA', 'DOLAR', '1167527311100013827383', 'PEPE.ZAPATO.SOL', 15200),
-(4, 1, '1110001622195', 'CA', 'PESO', '9697408911100016221953', 'BBE.FORMA.DOS', 5775.46),
+(4, 1, '1110001622195', 'CA', 'PESO', '9697408911100016221953', 'BEBE.FORMA.DOS', 6172.36),
 (5, 2, '1110007166460', 'CC', 'PESO', '1423372211100045866114', 'LABIO.ROJO', 8500),
 (6, 2, '1110001227573', 'CA', 'DOLAR', '9377438511100028664801', 'SOL.PRETAL', 6306.02),
 (7, 2, '1110009512721', 'CA', 'DOLAR', '6976629311100095127218', 'SORBO.LARGO', 85695.24),
@@ -139,7 +141,13 @@ INSERT INTO `movimientos` (`mov_id`, `mov_cuenta_origen_id`, `mov_cuenta_destino
 (186, 1, 4, '2023-06-21 12:57:39', '16873522599791', 'Transferencia de dinero', 41.5, 5677.04),
 (187, 4, 1, '2023-06-21 12:57:39', '16873522599791', 'Ingreso de dinero', 41.5, 5623.46),
 (188, 1, 4, '2023-06-21 13:32:59', '16873543790155', 'Transferencia de dinero', 152, 5525.04),
-(189, 4, 1, '2023-06-21 13:32:59', '16873543790155', 'Ingreso de dinero', 152, 5775.46);
+(189, 4, 1, '2023-06-21 13:32:59', '16873543790155', 'Ingreso de dinero', 152, 5775.46),
+(190, 1, 4, '2023-06-21 19:33:45', '16873760256408', 'Transferencia de dinero', 120.5, 5404.54),
+(191, 4, 1, '2023-06-21 19:33:45', '16873760256408', 'Ingreso de dinero', 120.5, 5895.96),
+(192, 1, 4, '2023-06-21 22:11:44', '1687385504539', 'Transferencia de dinero', 25.15, 5379.39),
+(193, 4, 1, '2023-06-21 22:11:44', '16873855045655', 'Ingreso de dinero', 25.15, 5921.11),
+(194, 1, 4, '2023-06-21 22:59:41', '16873883812126', 'Transferencia de dinero', 251.25, 5128.14),
+(195, 4, 1, '2023-06-21 22:59:41', '16873883812126', 'Ingreso de dinero', 251.25, 6172.36);
 
 -- --------------------------------------------------------
 
@@ -167,7 +175,7 @@ INSERT INTO `usuarios` (`user_id`, `user_nombre`, `user_apellido`, `user_email`,
 (1, 'Maximiliano', 'Pisso', 'mpisso@gmail.com', '7e713a2eef2ca385b216ad6722b58558de3cad1f6e016f2cd1bdffac62d22d0d', '3413346634', 'M', 3, 1),
 (2, 'Tamara', 'Sultano', 'tsultano@gmail.com', '8e66383abdf7de949387ce429c9a36ca10e074b8edd8878cb38f2785be141177', '3413458541', 'F', 0, 0),
 (3, 'Maria', 'Gomez', 'mgomez@gmail.com', '9cb52876243af5d83d94e749abcb31a51356e255058d27717798d9e0dbd89f72', '3416548562', 'F', 2, 1),
-(4, 'Emiliano', 'Cinquini', 'ecinquini@gmail.com', '1a20f6dad182e8b73b7a7793ca9b4cdaea33bf4efd59ab03291b967389c4faaa', '3415493162', 'M', 3, 1),
+(4, 'Emiliano', 'Cinquini', 'emicincope@gmail.com', '1a20f6dad182e8b73b7a7793ca9b4cdaea33bf4efd59ab03291b967389c4faaa', '3415493162', 'M', 3, 1),
 (5, 'Vicente', 'Vásquez', 'vicente.vasquez@example.com', 'ce950e64929630ffe525beb3e2f59269602daccccae41d6c369159e35215c3b6', '3415968778', 'M', 3, 1),
 (6, 'Marcos', 'Abila', 'marcos.abila@hotmail.com', '6a8299a2284437e6da4531d72d48f53aa967e9db7bc00fc6152d82fd119dddb2', '3415968778', 'M', 3, 1),
 (7, 'Gisella', 'Love', 'gise.love@gmail.com', '6234113fef7a822f5bbbb65d2f14efe0d84a6931b8d058c40c3e25c8a1882058', '3415968778', 'F', 3, 1);
@@ -181,7 +189,8 @@ INSERT INTO `usuarios` (`user_id`, `user_nombre`, `user_apellido`, `user_email`,
 --
 ALTER TABLE `credenciales`
   ADD PRIMARY KEY (`user_id`),
-  ADD KEY `user_id` (`user_id`);
+  ADD KEY `user_id` (`user_id`),
+  ADD KEY `user_id_2` (`user_id`);
 
 --
 -- Indices de la tabla `cuentas`
@@ -221,7 +230,7 @@ ALTER TABLE `cuentas`
 -- AUTO_INCREMENT de la tabla `movimientos`
 --
 ALTER TABLE `movimientos`
-  MODIFY `mov_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=190;
+  MODIFY `mov_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=196;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`

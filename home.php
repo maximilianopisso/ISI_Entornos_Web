@@ -41,7 +41,7 @@ try {
 
   $cuentasUsuario = $usuario->obtenerCuentas();
 } catch (Exception $e) {
-  header("Location: error.html", true, 404);
+  header("Location: error.html");
 }
 
 function habilitaTransferencia($cuentasUsuario)
