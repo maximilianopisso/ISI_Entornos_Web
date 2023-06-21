@@ -618,7 +618,7 @@ header nav .nav-container ul li a:hover {
 #contactos {
   background-color: #8842c1;
   width: 100%;
-  padding: 20vh 0px 10vh 0px;
+  padding: 15vh 0px 10vh 0px;
 }
 
 @media screen and (min-width: 577px) and (max-width: 991px) {
@@ -631,7 +631,7 @@ header nav .nav-container ul li a:hover {
 @media screen and (min-width: 0px) and (max-width: 576px) {
   #contactos {
     margin-top: 0vh;
-    padding-top: 20vh;
+    padding-top: 15vh;
   }
 }
 
@@ -639,14 +639,14 @@ header nav .nav-container ul li a:hover {
   font-size: 16px;
   text-align: center;
   color: white;
-  margin-top: 10vh;
+  margin-top: 5vh;
   padding: 0px 10vw;
 }
 
 @media screen and (max-width: 768px) {
   #contactos .leyenda {
     font-size: 15px;
-    margin-top: 7vh;
+    margin-top: 5vh;
   }
 }
 
