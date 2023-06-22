@@ -40,6 +40,7 @@ try {
   $cuentasUsuario = $usuario->obtenerCuentas();
 } catch (Exception $e) {
   header("Location: error.html");
+  exit();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

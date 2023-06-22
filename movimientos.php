@@ -41,6 +41,7 @@ try {
   $cuentasUsuario = $usuario->obtenerCuentas();
 } catch (Exception $e) {
   header("Location: error.html");
+  exit();
 }
 
 // Procesar formulario de selección de cuenta
