@@ -9,13 +9,13 @@ define('MAX_CANT_MOVIMIENTOS', 10);
 // Comprobar si la sesión está iniciada
 try {
   if (!session_start()) {
-    throw new Exception("Error al cargar la sesión del usuario logueado");
+    throw new Exception("Error al cargar la sesión del usuario logueado.");
   }
 
   // Obtener datos de la session PHP 
   $user_id = $_SESSION['user']['id'] ?? '';
   if (empty($user_id)) {
-    throw new Exception("No se pudieron obtener los datos de la sesión");
+    throw new Exception("No se pudieron obtener los datos de la sesión.");
   }
 
   // Obtener el usuario desde BD
@@ -23,7 +23,7 @@ try {
   $resultado = $databaseUser->getUsuarioById($user_id);
 
   if (!$resultado) {
-    throw new Exception("No se ha podido recuperar los datos del usuario");
+    throw new Exception("No se ha podido recuperar los datos del usuario.");
   }
 
   $usuario = new Usuario(
@@ -65,11 +65,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       );
       $movimientosCuenta = $cuentaSeleccionada->obtenerMovimientos();
     } catch (Exception $e) {
-      $error = $e->getMessage();
+      $error = Utils::obtenerMensajeExcepcion($e->getMessage());
       Utils::alert('Error: ' . $error);
     }
   } else {
-    $msjError = "No se ha seleccionado una cuenta";
+    $msjError = "No se ha seleccionado una cuenta.";
   }
 }
 ?>
@@ -83,15 +83,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Meta Tags -->
-  <meta name="description" content=" Este es el login de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
-       y transferencias de dinero se hagan a través de Internet." />
-  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
+  <meta name="description" content="Esta es la seccion de visualizacion de transacciones de cuentas de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
+       y transferencias de dinero se hagan a través de Internet.">
+  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion">
 
   <!-- Opengraph -->
-  <meta property="og:title" content="Movimientos | IBWallet | Tu Billetera Digital" />
+  <meta property="og:title" content="Movimientos | IBWallet | Tu Billetera Digital">
   <meta property="og:description" content="IBWallet es desarrollo de comercio electrónico que permite que los pagos
-    y transferencias de dinero se hagan a través de Internet" />
-  <meta property="og:image" content="https://ibwallet.000webhostapp.com/images/login.svg" />
+    y transferencias de dinero se hagan a través de Internet">
+  <meta property="og:image" content="https://ibwallet.000webhostapp.com/images/login.svg">
 
   <!-- Titulo -->
   <title>Movimientos | IBWallet | Tu Billetera Digital </title>
@@ -134,12 +134,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </ol>
     </nav>
     <?php
-    echo '<div id="movimientos" class="col-12 pt-4">';
+    echo '<div class="col-12 pt-4">';
     if (isset($cuentasUsuario) && count($cuentasUsuario) !== 0) {
       echo '<form action="movimientos.php" method="post">';
-      echo '<label for="seleccionarCuenta" style="font-weight: 600;">Seleccioná tu cuenta:</label>';
+      echo '<label for="selectCuenta" style="font-weight: 600;">Seleccioná tu cuenta:</label>';
       echo '<br>';
-      echo '<select class="form-control" style="width: 500px;" name="selectCuenta">';
+      echo '<select class="form-control" style="width: 500px;" id = "selectCuenta" name="selectCuenta">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
       foreach ($cuentasUsuario as $cuenta) {
         $valorCuenta = $cuenta["cue_tipo_cuenta"] . ' - ' . (($cuenta["cue_tipo_moneda"] === "PESO") ? '$' : 'U$S') . ' - ' . $cuenta["cue_nro_cuenta"];
@@ -189,18 +189,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         for ($i = 0; $i < $maxRegistros; $i++) {
           $movimiento = $movimientosCuenta[$i];
           echo '<tr>';
-          echo '<td scope="col">' . $i + 1 . '</td>';
-          echo '<td scope="col">' . $movimiento["mov_fecha"] . '</th>';
-          echo '<td scope="col">' . $movimiento["mov_nro_transaccion"] . '</th>';
-          echo '<td scope="col">' . $movimiento["mov_descripcion"] . '</th>';
+          echo '<td>' . $i + 1 . '</td>';
+          echo '<td>' . $movimiento["mov_fecha"] . '</td>';
+          echo '<td>' . $movimiento["mov_nro_transaccion"] . '</td>';
+          echo '<td>' . $movimiento["mov_descripcion"] . '</td>';
           //Si es una transferencia de dinero, el importe resta. El valor se muestra con un - por delante y en color rojo, caso contrario sin signo y en color verde.
           $signo = (strpos($movimiento["mov_descripcion"], "Transferencia") !== false) ? '-' : '';
           if ($signo === '-') {
-            echo '<td scope="col" style="color:red;">'  . $moneda . $signo . number_format($movimiento["mov_importe"], 2) . '</th>';
+            echo '<td style="color:red;">'  . $moneda . $signo . number_format($movimiento["mov_importe"], 2) . '</td>';
           } else {
-            echo '<td scope="col" style="color:green;">'  . $moneda . $signo . number_format($movimiento["mov_importe"], 2) . '</th>';
+            echo '<td style="color:green;">'  . $moneda . $signo . number_format($movimiento["mov_importe"], 2) . '</td>';
           }
-          echo '<td scope="col">' . $moneda . number_format($movimiento["mov_saldo"], 2) . '</th>';
+          echo '<td>' . $moneda . number_format($movimiento["mov_saldo"], 2) . '</td>';
           echo '</tr>';
         }
         echo ' </tbody>';
@@ -213,7 +213,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       //Hasta que no se seleccione una cuenta, muestro el msj.
       echo '<p style="color:red; font-weight:700">Seleccione una cuenta para ver sus últimos movimientos.</p>';
     }
-    echo '</div>';
     echo '<br>';
     echo '<form>';
     echo '<button type="submit" formaction="home.php" class="btn btn-danger" style= "width:200px;height:50px;font-weight:600;">Volver</button>';

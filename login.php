@@ -51,23 +51,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       }
     }
   } catch (Exception $e) {
-    $msjError = $e->getMessage();
+    $msjError = Utils::obtenerMensajeExcepcion($e->getMessage());
   }
 }
 
 // Para destruir la sesión de PHP
 if (isset($_GET['logout'])) {
   if (session_start()) {
+    // Setea una cookie con 1 segundo de vida, para que el browser borre la cookie.
     $params = session_get_cookie_params();
     setcookie(
-      session_name(),         // name
-      '',                     // value
+      session_name(),
+      '',
       1,
       $params['path'],
       $params['domain'],
       $params['secure'],
-      $params['httponly']                     // expire     
+      $params['httponly']
     );
+    //Elimina la session activa
     session_destroy();
   }
   header("Location: login.php");
@@ -84,14 +86,14 @@ if (isset($_GET['logout'])) {
 
   <!-- Meta Tags -->
   <meta name="description" content=" Este es el login de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
-       y transferencias de dinero se hagan a través de Internet." />
-  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
+       y transferencias de dinero se hagan a través de Internet.">
+  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion">
 
   <!-- Opengraph -->
-  <meta property="og:title" content="Login | IBWallet | Tu Billetera Digital" />
+  <meta property="og:title" content="Login | IBWallet | Tu Billetera Digital">
   <meta property="og:description" content="IBWallet es desarrollo de comercio electrónico que permite que los pagos
-    y transferencias de dinero se hagan a través de Internet" />
-  <meta property="og:image" content="https://ibwallet.000webhostapp.com/images/login.svg" />
+    y transferencias de dinero se hagan a través de Internet">
+  <meta property="og:image" content="https://ibwallet.000webhostapp.com/images/login.svg">
 
   <!-- Titulo -->
   <title>Login | IBWallet | Tu Billetera Digital </title>

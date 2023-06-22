@@ -65,26 +65,24 @@ function habilitaTransferencia($cuentasUsuario)
 <html lang="en" style="background-color: white; height: 100%;">
 
 <head>
-  <meta charset=" UTF-8">
+  <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Meta Tags -->
-  <meta name="description" content=" Esta es la Home de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
-            y transferencias de dinero se hagan a través de Internet." />
-  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
-
+  <meta name="description" content="Esta es la home del usuario de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos y transferencias de dinero se hagan a través de Internet.">
+  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta ban…ne, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion">
   <!-- Opengraph -->
-  <meta property="og:title" content="Home | IBWallet | Tu Billetera Digital" />
-  <meta property="og:description" content="IBWallet es desarrollo de comercio electrónico que permite que los pagos
-         y transferencias de dinero se hagan a través de Internet" />
-  <meta property="og:image" content="https:ibwallet.000webhostapp.com/images/login.svg" />
+  <meta property="og:title" content="Home | IBWallet | Tu Billetera Digital">
+  <meta property="og:description" content="IBWallet es un desarrollo de comercio electrónico que permite que los pagos y transferencias de dinero se hagan a través de Internet">
+  <meta property="og:image" content="https:ibwallet.000webhostapp.com/images/login.svg">
+
 
   <!-- Titulo -->
   <title>Home | IBWallet | Tu Billetera Digital </title>
 
   <!-- Boostrap -->
-  <link href="https:cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
 
   <!-- CSS -->
   <link rel="stylesheet" href="./css/appStyle.css">
@@ -151,16 +149,16 @@ function habilitaTransferencia($cuentasUsuario)
             echo '<tbody id="detalleResultadoTabla">';
             foreach ($cuentasUsuario as $key => $cuenta) {
               echo '<tr>';
-              echo '<td scope="col">' . $key + 1 . '</th>';
-              echo '<td scope="col">' . $cuenta["cue_nro_cuenta"] . '</th>';
-              echo '<td scope="col">' . $cuenta["cue_tipo_cuenta"] . '</th>';
-              echo '<td scope="col">' . $cuenta["cue_cbu"] . '</th>';
-              echo '<td scope="col">' . $cuenta["cue_alias"] . '</th>';
-              echo '<td scope="col">' . $cuenta["cue_tipo_moneda"] . '</th>';
+              echo '<td>' . $key + 1 . '</td>';
+              echo '<td>' . $cuenta["cue_nro_cuenta"] . '</td>';
+              echo '<td>' . $cuenta["cue_tipo_cuenta"] . '</td>';
+              echo '<td>' . $cuenta["cue_cbu"] . '</td>';
+              echo '<td>' . $cuenta["cue_alias"] . '</td>';
+              echo '<td>' . $cuenta["cue_tipo_moneda"] . '</td>';
               if ($cuenta["cue_tipo_moneda"] === "PESO") {
-                echo '<td scope="col"> $ ' . number_format($cuenta["cue_saldo"], 2) . '</th>';
+                echo '<td> $ ' . number_format($cuenta["cue_saldo"], 2) . '</td>';
               } else {
-                echo '<td scope="col"> U$S ' . number_format($cuenta["cue_saldo"], 2) . '</th>';
+                echo '<td> U$S ' . number_format($cuenta["cue_saldo"], 2) . '</td>';
               }
               echo '</tr>';
             }
@@ -177,7 +175,7 @@ function habilitaTransferencia($cuentasUsuario)
     if ($cuentasUsuario !== false) {
       echo '<h3> Operaciones </h3>';
       echo '<hr>';
-      echo '<div class="d-flex" style="padding: 0px auto;">';
+      echo '<div class="d-flex">';
 
       //Verifico si puedo habilitar transferencias en funcion de las cuentas del usuario
       $operaciones = habilitaTransferencia($cuentasUsuario);

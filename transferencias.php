@@ -50,18 +50,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $importe = (isset($_POST['importe']) && is_string($_POST['importe'])) ? $_POST['importe'] : '';
 
     if ($nroCuentaOrigen === "selecionar" || $nroCuentaDestino === "seleccionar") {
-      throw new Exception("Alguna de las cuentas no fue seleccionada");
+      throw new Exception("Alguna de las cuentas no fue seleccionada.");
     }
 
     if ($nroCuentaOrigen === $nroCuentaDestino) {
-      throw new Exception("Las cuentas tienen que ser distintas");
+      throw new Exception("Las cuentas seleccioandas deben ser distintas.");
     }
 
     if (is_numeric($importe)) {
       $importe = floatval($importe);
       $importe = round($importe, 2);
     } else {
-      throw new Exception("El importe no es valido");
+      throw new Exception("El importe ingresado no posee un formato válido.");
     }
 
     $databaseCuentaOrigen = new Database();
@@ -93,15 +93,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     );
 
     if ($cuentaOrigen->getTipoMoneda() !== $cuentaDestino->getTipoMoneda()) {
-      throw new Exception("Las cuentas deben tener la misma moneda");
+      throw new Exception("Las cuentas seleccionadas deben ser de la misma moneda.");
     }
 
     $transaccion = $cuentaOrigen->registrarTransacccion($cuentaDestino, $importe);
     if ($transaccion) {
-      $msjExito = "La transacción se ha realizado con éxito";
+      $msjExito = "La transacción se ha realizado con éxito.";
     }
   } catch (Exception $e) {
-    $msjError = $e->getMessage();
+    $msjError =  Utils::obtenerMensajeExcepcion($e->getMessage());
   }
 }
 ?>
@@ -114,15 +114,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <!-- Meta Tags -->
-  <meta name="description" content=" Este es el login de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
-       y transferencias de dinero se hagan a través de Internet." />
-  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion" />
+  <meta name="description" content=" Esta es la seccion de transferncias entre cuentra propias de la plataforma IBWallet, un desarrollo de comercio electrónico que permite que los pagos
+       y transferencias de dinero se hagan a través de Internet.">
+  <meta name="keywords" content="desarrolo web, dinero, transferencia, deposito, IBWallet, tarjeta bancaria, tarjeta debito, tarjeta credito,transferencia online, finanzas, operaciones financieras, operaciones, credito, debito,login, inicio sesion, sesion">
 
   <!-- Opengraph -->
-  <meta property="og:title" content="Transferencias | IBWallet | Tu Billetera Digital" />
+  <meta property="og:title" content="Transferencias | IBWallet | Tu Billetera Digital">
   <meta property="og:description" content="IBWallet es desarrollo de comercio electrónico que permite que los pagos
-    y transferencias de dinero se hagan a través de Internet" />
-  <meta property="og:image" content="https://ibwallet.000webhostapp.com/images/login.svg" />
+    y transferencias de dinero se hagan a través de Internet">
+  <meta property="og:image" content="https://ibwallet.000webhostapp.com/images/login.svg">
 
   <!-- Titulo -->
   <title>Transferencias | IBWallet | Tu Billetera Digital </title>
@@ -168,9 +168,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <hr>
     <?php
     if ($cuentasUsuario !== false && count($cuentasUsuario) !== 0) {
-      echo '<div id="transferencias" class="col-12 pt-2">';
+      echo '<div class="col-12 pt-2">';
       echo '<form id="formTransferencias" action="transferencias.php" method="post">';
-      echo '<label for="seleccionarCuentaOrigen" style="font-weight: 600;">Cuenta origen:</label><br>';
+      echo '<label for="cuentaOrigen" style="font-weight: 600;">Cuenta origen:</label><br>';
       echo '<select class="form-control" style="width: 500px;" name="cuentaOrigen" id="cuentaOrigen">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
       foreach ($cuentasUsuario as $cuenta) {
@@ -178,7 +178,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo '<option value="' . $cuenta["cue_nro_cuenta"] . '">' . $valorCuenta . '</option>';
       }
       echo '</select><br>';
-      echo '<label for="seleccionarCuentaDestino" style="font-weight: 600;">Cuenta Destino:</label><br>';
+      echo '<label for="cuentaDestino" style="font-weight: 600;">Cuenta Destino:</label><br>';
       echo '<select class="form-control" style="width: 500px;" name="cuentaDestino" id="cuentaDestino">';
       echo '<option value="seleccionar" selected>Seleccionar...</option>';
       foreach ($cuentasUsuario as $cuenta) {

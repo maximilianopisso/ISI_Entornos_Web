@@ -95,24 +95,6 @@ class Cuenta
         }
     }
 
-
-
-    private function registrarMovimiento($idDestino, $descripcion, $importe)
-    {
-        try {
-            $movimiento = new Movimiento($this->id, $idDestino, $descripcion, $importe, $this->saldo);
-            $resultado = $movimiento->registrarMovimiento();
-            if ($resultado) {
-                return true;
-            } else {
-                throw new Exception("Falla en el registro del nuevo movimiento");
-            }
-        } catch (Exception $e) {
-            throw new Exception($e->getMessage(), $e->getCode());
-        }
-    }
-
-
     public function registrarTransacccion(Cuenta $cuentaDestino, $importe)
     {
         try {
@@ -121,7 +103,7 @@ class Cuenta
                 $importe = floatval($importe);
                 $importe = round($importe, 2);
             } else {
-                throw new Exception("El importe ingresado no posee un formato válido");
+                throw new Exception("El importe ingresado no posee un formato válido.");
             }
 
             // Verifica si las cuentas tienen el mismo tipo de moneda
@@ -131,7 +113,7 @@ class Cuenta
 
             // Verifica que el importe sea > a 0
             if ($importe < 0) {
-                throw new Exception("El importe deber ser superior a $0.00");
+                throw new Exception("El importe deber ser superior a $0.00.");
             }
 
             // Verifica si la cuenta origen tiene suficiente saldo
