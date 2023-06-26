@@ -39,7 +39,7 @@ try {
   // Obtener las cuentas del usuario
   $cuentasUsuario = $usuario->obtenerCuentas();
 } catch (Exception $e) {
-  header("Location: error.html");
+  header("Location: error.php");
   exit();
 }
 

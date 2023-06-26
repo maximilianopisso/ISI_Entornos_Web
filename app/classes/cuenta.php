@@ -112,7 +112,7 @@ class Cuenta
             }
 
             // Verifica que el importe sea > a 0
-            if ($importe < 0) {
+            if ($importe <= 0) {
                 throw new Exception("El importe deber ser superior a $0.00.");
             }
 
@@ -132,7 +132,7 @@ class Cuenta
             $database->registrarOperacion($this->id, $this->saldo, $cuentaDestino, $importe);
             return true;
         } catch (Exception $e) {
-            throw new Exception($e);
+            throw $e;
         }
     }
 }
