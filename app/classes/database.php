@@ -18,7 +18,7 @@ class Database
                 throw new Exception($this->conexion->connect_error);
             }
         } catch (Exception $e) {
-            throw new Exception($e, $e->getCode());
+            throw $e;
         }
     }
 
@@ -299,7 +299,7 @@ class Database
                 $this->conexion->close();
             }
 
-            throw new Exception($e);
+            throw new Exception('Falla al ejecutar conjunto de QUERYS' . $e->getMessage(), $e->getCode());
         }
     }
 

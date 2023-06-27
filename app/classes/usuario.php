@@ -108,6 +108,7 @@ class Usuario
             throw new Exception("Falla al habilitar al usuario", $e->getCode());
         }
     }
+
     /**
      * Método que devuelve la clave encriptada de la que es ingresada por el usuario.
      */
